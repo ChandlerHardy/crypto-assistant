@@ -1,14 +1,36 @@
 import strawberry
 from typing import Optional
+from datetime import datetime
+import uuid
 from app.schemas.types import Portfolio, PortfolioAsset, CreatePortfolioInput, AddAssetInput
+
+# Simple in-memory storage for portfolios (would be replaced with database in production)
+PORTFOLIOS = {}
 
 @strawberry.type
 class Mutation:
     @strawberry.mutation
     async def create_portfolio(self, input: CreatePortfolioInput) -> Portfolio:
         """Create a new portfolio"""
-        # TODO: Implement with database service
-        raise NotImplementedError("create_portfolio mutation not implemented yet")
+        portfolio_id = str(uuid.uuid4())
+        now = datetime.now()
+        
+        portfolio = Portfolio(
+            id=portfolio_id,
+            name=input.name,
+            description=input.description,
+            totalValue=0.0,
+            totalProfitLoss=0.0,
+            totalProfitLossPercentage=0.0,
+            assets=[],
+            createdAt=now,
+            updatedAt=now
+        )
+        
+        # Store in memory
+        PORTFOLIOS[portfolio_id] = portfolio
+        
+        return portfolio
     
     @strawberry.mutation
     async def delete_portfolio(self, portfolio_id: str) -> bool:

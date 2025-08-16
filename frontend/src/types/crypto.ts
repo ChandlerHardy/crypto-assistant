@@ -41,6 +41,7 @@ export interface PortfolioAsset {
 export interface Portfolio {
   id: string;
   name: string;
+  description?: string;
   totalValue: number;
   totalProfitLoss: number;
   totalProfitLossPercentage: number;

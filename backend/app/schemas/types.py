@@ -46,6 +46,7 @@ class PortfolioAsset:
 class Portfolio:
     id: str
     name: str
+    description: Optional[str] = None
     totalValue: float
     totalProfitLoss: float
     totalProfitLossPercentage: float
@@ -61,6 +62,7 @@ class PriceData:
 @strawberry.input
 class CreatePortfolioInput:
     name: str
+    description: Optional[str] = None
 
 @strawberry.input
 class AddAssetInput:

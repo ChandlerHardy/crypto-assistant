@@ -90,8 +90,8 @@ class Query:
     @strawberry.field
     async def portfolios(self) -> List[Portfolio]:
         """Get all user portfolios"""
-        # TODO: Implement with database service
-        return []
+        from app.schemas.mutations import PORTFOLIOS
+        return list(PORTFOLIOS.values())
     
     @strawberry.field
     async def portfolio(self, id: str) -> Optional[Portfolio]:
