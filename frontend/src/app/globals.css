@@ -1,71 +1,12 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Fix color inversion - light should be light colors */
-html.light body,
-html.light body[class],
-html[class="light"] body,
-html:not(.dark) body[class*="geist"] {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  color: #171717 !important;
-}
-
-/* Dark should be dark colors */
-html.dark body,
-html.dark body[class],
-html[class="dark"] body,
-html[class*="dark"] body[class*="geist"] {
-  background: #0a0a0a !important;
-  background-color: #0a0a0a !important;
-  color: #ededed !important;
-}
-
-/* Even more aggressive targeting */
-body[class*="geist"] {
-  font-family: Arial, Helvetica, sans-serif !important;
-  transition: all 0.3s ease !important;
-}
-
-/* Override Tailwind base styles */
-*,
-*::before,
-*::after {
-  transition: background-color 0.3s ease, color 0.3s ease !important;
-}
-
-/* Override component backgrounds for dark mode - more specific */
-html.dark .bg-gray-50,
-html.dark .bg-white {
-  background-color: #1f2937 !important;
-}
-
-html.dark .text-gray-900,
-html.dark .text-gray-700 {
-  color: #f9fafb !important;
-}
-
-/* Override component backgrounds for light mode - more specific */
-html.light .bg-gray-900 {
-  background-color: #ffffff !important;
-}
-
-html.light .text-white,
-html.light .text-gray-100 {
-  color: #111827 !important;
-}
-
-/* Custom properties */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-html.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+/* Ensure dark mode classes work properly */
+.dark {
   color-scheme: dark;
 }
 
-html.light {
+.light {
   color-scheme: light;
 }
