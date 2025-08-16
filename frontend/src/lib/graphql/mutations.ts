@@ -26,8 +26,8 @@ export const CREATE_PORTFOLIO = gql`
 `;
 
 export const UPDATE_PORTFOLIO = gql`
-  mutation UpdatePortfolio($id: String!, $name: String, $description: String) {
-    updatePortfolio(id: $id, name: $name, description: $description) {
+  mutation UpdatePortfolio($portfolioId: String!, $name: String, $description: String) {
+    updatePortfolio(portfolioId: $portfolioId, name: $name, description: $description) {
       id
       name
       description
@@ -41,19 +41,20 @@ export const UPDATE_PORTFOLIO = gql`
 `;
 
 export const DELETE_PORTFOLIO = gql`
-  mutation DeletePortfolio($id: String!) {
-    deletePortfolio(id: $id)
+  mutation DeletePortfolio($portfolioId: String!) {
+    deletePortfolio(portfolioId: $portfolioId)
   }
 `;
 
 export const ADD_ASSET_TO_PORTFOLIO = gql`
-  mutation AddAssetToPortfolio($portfolioId: String!, $cryptoId: String!, $amount: Float!, $purchasePrice: Float!) {
-    addAssetToPortfolio(portfolioId: $portfolioId, cryptoId: $cryptoId, amount: $amount, purchasePrice: $purchasePrice) {
+  mutation AddAssetToPortfolio($input: AddAssetInput!) {
+    addAssetToPortfolio(input: $input) {
       id
+      cryptoId
       symbol
       name
       amount
-      purchasePrice
+      averageBuyPrice
       currentPrice
       totalValue
       profitLoss

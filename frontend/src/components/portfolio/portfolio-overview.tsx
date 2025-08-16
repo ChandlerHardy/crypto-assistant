@@ -5,11 +5,14 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
 import { CREATE_PORTFOLIO } from '@/lib/graphql/mutations';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
 import { Wallet, TrendingUp, TrendingDown, Plus, X } from 'lucide-react';
 import { Portfolio } from '@/types/crypto';
 
 export function PortfolioOverview() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
+  const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   
@@ -19,7 +22,7 @@ export function PortfolioOverview() {
 
   const [createPortfolio, { loading: creating }] = useMutation(CREATE_PORTFOLIO, {
     onCompleted: () => {
-      setIsModalOpen(false);
+      setIsCreateModalOpen(false);
       setName('');
       setDescription('');
       refetch();
@@ -28,6 +31,11 @@ export function PortfolioOverview() {
       alert('Failed to create portfolio: ' + error.message);
     },
   });
+
+  const handleAddAsset = (portfolio: Portfolio) => {
+    setSelectedPortfolio(portfolio);
+    setIsAddAssetModalOpen(true);
+  };
 
   const handleCreatePortfolio = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +111,7 @@ export function PortfolioOverview() {
               Create your first portfolio to start tracking your crypto investments
             </p>
             <button 
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -112,12 +120,12 @@ export function PortfolioOverview() {
           </div>
         </CardContent>
         
-        {/* Modal */}
-        {isModalOpen && (
+        {/* Create Portfolio Modal */}
+        {isCreateModalOpen && (
           <div 
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
             style={{ zIndex: 9999 }}
-            onClick={() => setIsModalOpen(false)}
+            onClick={() => setIsCreateModalOpen(false)}
           >
             <div 
               className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
@@ -129,7 +137,7 @@ export function PortfolioOverview() {
                   Create New Portfolio
                 </h2>
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => setIsCreateModalOpen(false)}
                   className="p-1 hover:bg-gray-100 rounded"
                 >
                   <X className="w-4 h-4" />
@@ -167,7 +175,7 @@ export function PortfolioOverview() {
                 <div className="flex items-center justify-end space-x-3">
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => setIsCreateModalOpen(false)}
                     className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
                     disabled={creating}
                   >
@@ -258,7 +266,7 @@ export function PortfolioOverview() {
           <CardTitle className="flex items-center justify-between">
             <span>Your Portfolios</span>
             <button 
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4 mr-1" />
@@ -269,43 +277,80 @@ export function PortfolioOverview() {
         <CardContent>
           <div className="space-y-4">
             {portfolios.map((portfolio) => (
-              <div
-                key={portfolio.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div>
-                  <h4 className="font-medium text-gray-900">{portfolio.name}</h4>
-                  {portfolio.description && (
-                    <p className="text-sm text-gray-500">{portfolio.description}</p>
-                  )}
-                  <p className="text-sm text-gray-500">
-                    {portfolio.assets.length} assets
-                  </p>
+              <div key={portfolio.id} className="border border-gray-200 rounded-lg p-4 space-y-4">
+                {/* Portfolio Header */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">{portfolio.name}</h4>
+                    {portfolio.description && (
+                      <p className="text-sm text-gray-500">{portfolio.description}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900">
+                      ${portfolio.totalValue.toLocaleString()}
+                    </p>
+                    <p className={`text-sm ${
+                      portfolio.totalProfitLossPercentage >= 0 
+                        ? 'text-green-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {portfolio.totalProfitLossPercentage >= 0 ? '+' : ''}{portfolio.totalProfitLossPercentage.toFixed(2)}%
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900">
-                    ${portfolio.totalValue.toLocaleString()}
-                  </p>
-                  <p className={`text-sm ${
-                    portfolio.totalProfitLossPercentage >= 0 
-                      ? 'text-green-600' 
-                      : 'text-red-600'
-                  }`}>
-                    {portfolio.totalProfitLossPercentage.toFixed(2)}%
-                  </p>
-                </div>
+
+                {/* Assets List */}
+                {portfolio.assets.length > 0 ? (
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-gray-700">Assets ({portfolio.assets.length})</h5>
+                    {portfolio.assets.map((asset) => (
+                      <div key={asset.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                        <div className="flex items-center space-x-3">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{asset.name}</p>
+                            <p className="text-xs text-gray-500">{asset.amount} {asset.symbol.toUpperCase()}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">
+                            ${asset.totalValue.toLocaleString()}
+                          </p>
+                          <p className={`text-xs ${
+                            asset.profitLossPercentage >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {asset.profitLossPercentage >= 0 ? '+' : ''}{asset.profitLossPercentage.toFixed(2)}%
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500 text-sm">
+                    No assets yet. Add your first cryptocurrency!
+                  </div>
+                )}
+
+                {/* Add Asset Button */}
+                <button
+                  onClick={() => handleAddAsset(portfolio)}
+                  className="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-300 hover:text-blue-600 transition-colors text-sm"
+                >
+                  <Plus className="w-4 h-4 inline mr-2" />
+                  Add Asset
+                </button>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Modal for when portfolios exist */}
-      {isModalOpen && (
+      {/* Create Portfolio Modal for when portfolios exist */}
+      {isCreateModalOpen && (
         <div 
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           style={{ zIndex: 9999 }}
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => setIsCreateModalOpen(false)}
         >
           <div 
             className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
@@ -317,7 +362,7 @@ export function PortfolioOverview() {
                 Create New Portfolio
               </h2>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsCreateModalOpen(false)}
                 className="p-1 hover:bg-gray-100 rounded"
               >
                 <X className="w-4 h-4" />
@@ -355,7 +400,7 @@ export function PortfolioOverview() {
               <div className="flex items-center justify-end space-x-3">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => setIsCreateModalOpen(false)}
                   className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
                   disabled={creating}
                 >
@@ -372,6 +417,19 @@ export function PortfolioOverview() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Add Asset Modal */}
+      {selectedPortfolio && (
+        <AddAssetModal
+          isOpen={isAddAssetModalOpen}
+          onClose={() => {
+            setIsAddAssetModalOpen(false);
+            setSelectedPortfolio(null);
+          }}
+          portfolioId={selectedPortfolio.id}
+          portfolioName={selectedPortfolio.name}
+        />
       )}
     </div>
   );

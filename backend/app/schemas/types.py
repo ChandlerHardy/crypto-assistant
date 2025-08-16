@@ -7,52 +7,52 @@ class CryptoCurrency:
     id: str
     symbol: str
     name: str
-    currentPrice: float
-    marketCap: float
-    marketCapRank: int
-    fullyDilutedValuation: Optional[float] = None
-    totalVolume: float
-    high24h: float
-    low24h: float
-    priceChange24h: float
-    priceChangePercentage24h: float
-    marketCapChange24h: float
-    marketCapChangePercentage24h: float
-    circulatingSupply: float
-    totalSupply: Optional[float] = None
-    maxSupply: Optional[float] = None
+    current_price: float = strawberry.field(name="currentPrice")
+    market_cap: float = strawberry.field(name="marketCap")
+    market_cap_rank: int = strawberry.field(name="marketCapRank")
+    fully_diluted_valuation: Optional[float] = strawberry.field(name="fullyDilutedValuation", default=None)
+    total_volume: float = strawberry.field(name="totalVolume")
+    high_24h: float = strawberry.field(name="high24h")
+    low_24h: float = strawberry.field(name="low24h")
+    price_change_24h: float = strawberry.field(name="priceChange24h")
+    price_change_percentage_24h: float = strawberry.field(name="priceChangePercentage24h")
+    market_cap_change_24h: float = strawberry.field(name="marketCapChange24h")
+    market_cap_change_percentage_24h: float = strawberry.field(name="marketCapChangePercentage24h")
+    circulating_supply: float = strawberry.field(name="circulatingSupply")
+    total_supply: Optional[float] = strawberry.field(name="totalSupply", default=None)
+    max_supply: Optional[float] = strawberry.field(name="maxSupply", default=None)
     ath: float
-    athChangePercentage: float
-    athDate: datetime
+    ath_change_percentage: float = strawberry.field(name="athChangePercentage")
+    ath_date: datetime = strawberry.field(name="athDate")
     atl: float
-    atlChangePercentage: float
-    atlDate: datetime
-    lastUpdated: datetime
+    atl_change_percentage: float = strawberry.field(name="atlChangePercentage")
+    atl_date: datetime = strawberry.field(name="atlDate")
+    last_updated: datetime = strawberry.field(name="lastUpdated")
 
 @strawberry.type
 class PortfolioAsset:
     id: str
-    cryptoId: str
+    crypto_id: str = strawberry.field(name="cryptoId")
     symbol: str
     name: str
     amount: float
-    averageBuyPrice: float
-    currentPrice: float
-    totalValue: float
-    profitLoss: float
-    profitLossPercentage: float
+    average_buy_price: float = strawberry.field(name="averageBuyPrice")
+    current_price: float = strawberry.field(name="currentPrice")
+    total_value: float = strawberry.field(name="totalValue")
+    profit_loss: float = strawberry.field(name="profitLoss")
+    profit_loss_percentage: float = strawberry.field(name="profitLossPercentage")
 
 @strawberry.type
 class Portfolio:
     id: str
     name: str
     description: Optional[str] = None
-    totalValue: float
-    totalProfitLoss: float
-    totalProfitLossPercentage: float
+    total_value: float = strawberry.field(name="totalValue")
+    total_profit_loss: float = strawberry.field(name="totalProfitLoss")
+    total_profit_loss_percentage: float = strawberry.field(name="totalProfitLossPercentage")
     assets: List[PortfolioAsset]
-    createdAt: datetime
-    updatedAt: datetime
+    created_at: datetime = strawberry.field(name="createdAt")
+    updated_at: datetime = strawberry.field(name="updatedAt")
 
 @strawberry.type
 class PriceData:
@@ -66,7 +66,7 @@ class CreatePortfolioInput:
 
 @strawberry.input
 class AddAssetInput:
-    portfolio_id: str
-    crypto_id: str
+    portfolio_id: str = strawberry.field(name="portfolioId")
+    crypto_id: str = strawberry.field(name="cryptoId")
     amount: float
-    buy_price: float
+    buy_price: float = strawberry.field(name="buyPrice")
