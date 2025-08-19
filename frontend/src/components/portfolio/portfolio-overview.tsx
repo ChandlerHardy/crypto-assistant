@@ -6,14 +6,14 @@ import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
 import { CREATE_PORTFOLIO, DELETE_PORTFOLIO, UPDATE_ASSET } from '@/lib/graphql/mutations';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
-import { EditAssetModal } from '@/components/portfolio/edit-asset-modal';
+import { AssetDetailModal } from '@/components/portfolio/asset-detail-modal';
 import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2 } from 'lucide-react';
 import { Portfolio, PortfolioAsset } from '@/types/crypto';
 
 export function PortfolioOverview() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
-  const [isEditAssetModalOpen, setIsEditAssetModalOpen] = useState(false);
+  const [isAssetDetailModalOpen, setIsAssetDetailModalOpen] = useState(false);
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<PortfolioAsset | null>(null);
   const [name, setName] = useState('');
@@ -54,7 +54,7 @@ export function PortfolioOverview() {
   const handleEditAsset = (asset: PortfolioAsset, portfolio: Portfolio) => {
     setSelectedAsset(asset);
     setSelectedPortfolio(portfolio);
-    setIsEditAssetModalOpen(true);
+    setIsAssetDetailModalOpen(true);
   };
 
   const handleCreatePortfolio = async (e: React.FormEvent) => {
@@ -473,12 +473,12 @@ export function PortfolioOverview() {
         />
       )}
 
-      {/* Edit Asset Modal */}
+      {/* Asset Detail Modal */}
       {selectedAsset && selectedPortfolio && (
-        <EditAssetModal
-          isOpen={isEditAssetModalOpen}
+        <AssetDetailModal
+          isOpen={isAssetDetailModalOpen}
           onClose={() => {
-            setIsEditAssetModalOpen(false);
+            setIsAssetDetailModalOpen(false);
             setSelectedAsset(null);
             setSelectedPortfolio(null);
           }}

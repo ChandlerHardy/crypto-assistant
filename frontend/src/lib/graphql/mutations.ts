@@ -82,6 +82,29 @@ export const UPDATE_ASSET = gql`
       totalValue
       profitLoss
       profitLossPercentage
+      transactions {
+        id
+        transactionType
+        amount
+        pricePerUnit
+        totalValue
+        timestamp
+        notes
+      }
+    }
+  }
+`;
+
+export const ADD_TRANSACTION = gql`
+  mutation AddTransaction($input: AddTransactionInput!) {
+    addTransaction(input: $input) {
+      id
+      transactionType
+      amount
+      pricePerUnit
+      totalValue
+      timestamp
+      notes
     }
   }
 `;

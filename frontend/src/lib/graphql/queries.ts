@@ -54,13 +54,24 @@ export const GET_PORTFOLIOS = gql`
       updatedAt
       assets {
         id
+        cryptoId
         symbol
         name
         amount
+        averageBuyPrice
         currentPrice
         totalValue
         profitLoss
         profitLossPercentage
+        transactions {
+          id
+          transactionType
+          amount
+          pricePerUnit
+          totalValue
+          timestamp
+          notes
+        }
       }
     }
   }

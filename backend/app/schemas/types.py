@@ -30,6 +30,16 @@ class CryptoCurrency:
     last_updated: datetime = strawberry.field(name="lastUpdated")
 
 @strawberry.type
+class AssetTransaction:
+    id: str
+    transaction_type: str = strawberry.field(name="transactionType")  # "buy" or "sell"
+    amount: float
+    price_per_unit: float = strawberry.field(name="pricePerUnit")
+    total_value: float = strawberry.field(name="totalValue")
+    timestamp: datetime
+    notes: Optional[str] = None
+
+@strawberry.type
 class PortfolioAsset:
     id: str
     crypto_id: str = strawberry.field(name="cryptoId")
@@ -41,6 +51,7 @@ class PortfolioAsset:
     total_value: float = strawberry.field(name="totalValue")
     profit_loss: float = strawberry.field(name="profitLoss")
     profit_loss_percentage: float = strawberry.field(name="profitLossPercentage")
+    transactions: List["AssetTransaction"] = strawberry.field(default_factory=list)
 
 @strawberry.type
 class Portfolio:
@@ -77,3 +88,12 @@ class UpdateAssetInput:
     asset_id: str = strawberry.field(name="assetId")
     amount: float
     buy_price: float = strawberry.field(name="buyPrice")
+
+@strawberry.input
+class AddTransactionInput:
+    portfolio_id: str = strawberry.field(name="portfolioId")
+    asset_id: str = strawberry.field(name="assetId")
+    transaction_type: str = strawberry.field(name="transactionType")  # "buy" or "sell"
+    amount: float
+    price_per_unit: float = strawberry.field(name="pricePerUnit")
+    notes: Optional[str] = None

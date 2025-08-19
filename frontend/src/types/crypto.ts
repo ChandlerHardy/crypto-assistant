@@ -25,6 +25,16 @@ export interface CryptoCurrency {
   lastUpdated: string;
 }
 
+export interface AssetTransaction {
+  id: string;
+  transactionType: 'buy' | 'sell';
+  amount: number;
+  pricePerUnit: number;
+  totalValue: number;
+  timestamp: string;
+  notes?: string;
+}
+
 export interface PortfolioAsset {
   id: string;
   cryptoId: string;
@@ -36,6 +46,7 @@ export interface PortfolioAsset {
   totalValue: number;
   profitLoss: number;
   profitLossPercentage: number;
+  transactions: AssetTransaction[];
 }
 
 export interface Portfolio {
