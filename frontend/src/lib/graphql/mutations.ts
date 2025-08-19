@@ -68,3 +68,20 @@ export const REMOVE_ASSET_FROM_PORTFOLIO = gql`
     removeAssetFromPortfolio(portfolioId: $portfolioId, assetId: $assetId)
   }
 `;
+
+export const UPDATE_ASSET = gql`
+  mutation UpdateAsset($input: UpdateAssetInput!) {
+    updateAsset(input: $input) {
+      id
+      cryptoId
+      symbol
+      name
+      amount
+      averageBuyPrice
+      currentPrice
+      totalValue
+      profitLoss
+      profitLossPercentage
+    }
+  }
+`;

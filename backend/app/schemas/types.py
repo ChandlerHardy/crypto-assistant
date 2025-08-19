@@ -70,3 +70,10 @@ class AddAssetInput:
     crypto_id: str = strawberry.field(name="cryptoId")
     amount: float
     buy_price: float = strawberry.field(name="buyPrice")
+
+@strawberry.input
+class UpdateAssetInput:
+    portfolio_id: str = strawberry.field(name="portfolioId")
+    asset_id: str = strawberry.field(name="assetId")
+    amount: float
+    buy_price: float = strawberry.field(name="buyPrice")

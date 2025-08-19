@@ -9,15 +9,6 @@ export default function Home() {
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Crypto Portfolio Dashboard
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Track your cryptocurrency investments and market trends in real-time
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Portfolio Overview */}
           <div className="lg:col-span-2">

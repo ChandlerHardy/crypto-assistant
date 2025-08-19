@@ -3,16 +3,19 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
-import { CREATE_PORTFOLIO, DELETE_PORTFOLIO } from '@/lib/graphql/mutations';
+import { CREATE_PORTFOLIO, DELETE_PORTFOLIO, UPDATE_ASSET } from '@/lib/graphql/mutations';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
+import { EditAssetModal } from '@/components/portfolio/edit-asset-modal';
 import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2 } from 'lucide-react';
-import { Portfolio } from '@/types/crypto';
+import { Portfolio, PortfolioAsset } from '@/types/crypto';
 
 export function PortfolioOverview() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
+  const [isEditAssetModalOpen, setIsEditAssetModalOpen] = useState(false);
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<PortfolioAsset | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [deleteConfirmPortfolio, setDeleteConfirmPortfolio] = useState<Portfolio | null>(null);
@@ -46,6 +49,12 @@ export function PortfolioOverview() {
   const handleAddAsset = (portfolio: Portfolio) => {
     setSelectedPortfolio(portfolio);
     setIsAddAssetModalOpen(true);
+  };
+
+  const handleEditAsset = (asset: PortfolioAsset, portfolio: Portfolio) => {
+    setSelectedAsset(asset);
+    setSelectedPortfolio(portfolio);
+    setIsEditAssetModalOpen(true);
   };
 
   const handleCreatePortfolio = async (e: React.FormEvent) => {
@@ -333,7 +342,11 @@ export function PortfolioOverview() {
                   <div className="space-y-2">
                     <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">Assets ({portfolio.assets.length})</h5>
                     {portfolio.assets.map((asset) => (
-                      <div key={asset.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <div 
+                        key={asset.id} 
+                        onClick={() => handleEditAsset(asset, portfolio)}
+                        className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                      >
                         <div className="flex items-center space-x-3">
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">{asset.name}</p>
@@ -455,6 +468,21 @@ export function PortfolioOverview() {
             setIsAddAssetModalOpen(false);
             setSelectedPortfolio(null);
           }}
+          portfolioId={selectedPortfolio.id}
+          portfolioName={selectedPortfolio.name}
+        />
+      )}
+
+      {/* Edit Asset Modal */}
+      {selectedAsset && selectedPortfolio && (
+        <EditAssetModal
+          isOpen={isEditAssetModalOpen}
+          onClose={() => {
+            setIsEditAssetModalOpen(false);
+            setSelectedAsset(null);
+            setSelectedPortfolio(null);
+          }}
+          asset={selectedAsset}
           portfolioId={selectedPortfolio.id}
           portfolioName={selectedPortfolio.name}
         />
