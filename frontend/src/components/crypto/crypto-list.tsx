@@ -80,17 +80,33 @@ export function CryptoList({ limit = 20 }: CryptoListProps) {
           {cryptocurrencies.map((crypto) => (
             <div
               key={crypto.id}
-              className="flex items-center justify-between py-3 px-2 hover:bg-gray-50 rounded-lg transition-colors"
+              className="flex items-center justify-between py-3 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">
-                    {crypto.symbol.slice(0, 2).toUpperCase()}
-                  </span>
+                <div className="w-8 h-8 rounded-full overflow-hidden">
+                  <img
+                    src={`https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/icon/${crypto.symbol.toLowerCase()}.png`}
+                    alt={crypto.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to gradient circle with symbol
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallbackDiv = target.nextElementSibling as HTMLDivElement;
+                      if (fallbackDiv) {
+                        fallbackDiv.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center" style={{ display: 'none' }}>
+                    <span className="text-white text-xs font-bold">
+                      {crypto.symbol.slice(0, 2).toUpperCase()}
+                    </span>
+                  </div>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-900">{crypto.name}</div>
-                  <div className="text-sm text-gray-500">{crypto.symbol.toUpperCase()}</div>
+                  <div className="font-medium text-gray-900 dark:text-white">{crypto.name}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{crypto.symbol.toUpperCase()}</div>
                 </div>
               </div>
               

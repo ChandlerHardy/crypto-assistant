@@ -104,7 +104,7 @@ export function PortfolioOverview() {
         <CardContent>
           <div className="text-center py-12">
             <Wallet className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               No portfolios yet
             </h3>
             <p className="text-gray-500 mb-6">
