@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
-import { CREATE_PORTFOLIO } from '@/lib/graphql/mutations';
+import { CREATE_PORTFOLIO, DELETE_PORTFOLIO } from '@/lib/graphql/mutations';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
-import { Wallet, TrendingUp, TrendingDown, Plus, X } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2 } from 'lucide-react';
 import { Portfolio } from '@/types/crypto';
 
 export function PortfolioOverview() {
@@ -15,6 +15,7 @@ export function PortfolioOverview() {
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [deleteConfirmPortfolio, setDeleteConfirmPortfolio] = useState<Portfolio | null>(null);
   
   const { data, loading, error, refetch } = useQuery(GET_PORTFOLIOS, {
     pollInterval: 30000,
@@ -29,6 +30,16 @@ export function PortfolioOverview() {
     },
     onError: (error) => {
       alert('Failed to create portfolio: ' + error.message);
+    },
+  });
+
+  const [deletePortfolio, { loading: deleting }] = useMutation(DELETE_PORTFOLIO, {
+    onCompleted: () => {
+      setDeleteConfirmPortfolio(null);
+      refetch();
+    },
+    onError: (error) => {
+      alert('Failed to delete portfolio: ' + error.message);
     },
   });
 
@@ -47,6 +58,14 @@ export function PortfolioOverview() {
           name: name.trim(),
           description: description.trim() || null,
         },
+      },
+    });
+  };
+
+  const handleDeletePortfolio = async (portfolio: Portfolio) => {
+    await deletePortfolio({
+      variables: {
+        portfolioId: portfolio.id,
       },
     });
   };
@@ -128,17 +147,17 @@ export function PortfolioOverview() {
             onClick={() => setIsCreateModalOpen(false)}
           >
             <div 
-              className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold flex items-center">
+                <h2 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
                   <Plus className="w-5 h-5 mr-2" />
                   Create New Portfolio
                 </h2>
                 <button
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500 dark:text-gray-400"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -146,7 +165,7 @@ export function PortfolioOverview() {
               
               <form onSubmit={handleCreatePortfolio}>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Portfolio Name *
                   </label>
                   <input
@@ -154,13 +173,13 @@ export function PortfolioOverview() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="My Crypto Portfolio"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                     required
                   />
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Description
                   </label>
                   <textarea
@@ -168,7 +187,7 @@ export function PortfolioOverview() {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Optional description"
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
 
@@ -176,7 +195,7 @@ export function PortfolioOverview() {
                   <button
                     type="button"
                     onClick={() => setIsCreateModalOpen(false)}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                     disabled={creating}
                   >
                     Cancel
@@ -209,8 +228,8 @@ export function PortfolioOverview() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total Value</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Value</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   ${totalValue.toLocaleString()}
                 </p>
               </div>
@@ -223,7 +242,7 @@ export function PortfolioOverview() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total P&L</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total P&L</p>
                 <p className={`text-2xl font-bold ${
                   totalProfitLoss >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
@@ -243,7 +262,7 @@ export function PortfolioOverview() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">Total P&L %</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total P&L %</p>
                 <p className={`text-2xl font-bold ${
                   totalProfitLossPercentage >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
@@ -281,39 +300,48 @@ export function PortfolioOverview() {
                 {/* Portfolio Header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-gray-900">{portfolio.name}</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white">{portfolio.name}</h4>
                     {portfolio.description && (
-                      <p className="text-sm text-gray-500">{portfolio.description}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{portfolio.description}</p>
                     )}
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-900">
-                      ${portfolio.totalValue.toLocaleString()}
-                    </p>
-                    <p className={`text-sm ${
-                      portfolio.totalProfitLossPercentage >= 0 
-                        ? 'text-green-600' 
-                        : 'text-red-600'
-                    }`}>
-                      {portfolio.totalProfitLossPercentage >= 0 ? '+' : ''}{portfolio.totalProfitLossPercentage.toFixed(2)}%
-                    </p>
+                  <div className="flex items-center space-x-3">
+                    <div className="text-right">
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        ${portfolio.totalValue.toLocaleString()}
+                      </p>
+                      <p className={`text-sm ${
+                        portfolio.totalProfitLossPercentage >= 0 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`}>
+                        {portfolio.totalProfitLossPercentage >= 0 ? '+' : ''}{portfolio.totalProfitLossPercentage.toFixed(2)}%
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setDeleteConfirmPortfolio(portfolio)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                      title="Delete portfolio"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
 
                 {/* Assets List */}
                 {portfolio.assets.length > 0 ? (
                   <div className="space-y-2">
-                    <h5 className="text-sm font-medium text-gray-700">Assets ({portfolio.assets.length})</h5>
+                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">Assets ({portfolio.assets.length})</h5>
                     {portfolio.assets.map((asset) => (
-                      <div key={asset.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                      <div key={asset.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded">
                         <div className="flex items-center space-x-3">
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{asset.name}</p>
-                            <p className="text-xs text-gray-500">{asset.amount} {asset.symbol.toUpperCase()}</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{asset.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{asset.amount} {asset.symbol.toUpperCase()}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
                             ${asset.totalValue.toLocaleString()}
                           </p>
                           <p className={`text-xs ${
@@ -353,17 +381,17 @@ export function PortfolioOverview() {
           onClick={() => setIsCreateModalOpen(false)}
         >
           <div 
-            className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold flex items-center">
+              <h2 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
                 <Plus className="w-5 h-5 mr-2" />
                 Create New Portfolio
               </h2>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500 dark:text-gray-400"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -371,7 +399,7 @@ export function PortfolioOverview() {
             
             <form onSubmit={handleCreatePortfolio}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Portfolio Name *
                 </label>
                 <input
@@ -379,13 +407,13 @@ export function PortfolioOverview() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="My Crypto Portfolio"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   required
                 />
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
@@ -393,7 +421,7 @@ export function PortfolioOverview() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Optional description"
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
 
@@ -401,7 +429,7 @@ export function PortfolioOverview() {
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                   disabled={creating}
                 >
                   Cancel
@@ -430,6 +458,59 @@ export function PortfolioOverview() {
           portfolioId={selectedPortfolio.id}
           portfolioName={selectedPortfolio.name}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmPortfolio && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          style={{ zIndex: 9999 }}
+          onClick={() => setDeleteConfirmPortfolio(null)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
+                <Trash2 className="w-5 h-5 mr-2 text-red-600" />
+                Delete Portfolio
+              </h2>
+              <button
+                onClick={() => setDeleteConfirmPortfolio(null)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500 dark:text-gray-400"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 dark:text-gray-300 mb-2">
+                Are you sure you want to delete the portfolio <strong>"{deleteConfirmPortfolio.name}"</strong>?
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                This action cannot be undone. All assets in this portfolio will be permanently removed.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end space-x-3">
+              <button
+                onClick={() => setDeleteConfirmPortfolio(null)}
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeletePortfolio(deleteConfirmPortfolio)}
+                disabled={deleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? 'Deleting...' : 'Delete Portfolio'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

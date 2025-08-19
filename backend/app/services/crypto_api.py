@@ -58,7 +58,11 @@ class CryptoAPIService:
             
             response.raise_for_status()
             return response.json()
-        except httpx.HTTPStatusError:
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error fetching {crypto_id}: {e.response.status_code} - {e.response.text}")
+            return None
+        except Exception as e:
+            print(f"Error fetching cryptocurrency {crypto_id}: {e}")
             return None
     
     async def get_price_history(

@@ -35,8 +35,14 @@ class Mutation:
     @strawberry.mutation
     async def delete_portfolio(self, portfolio_id: str = strawberry.argument(name="portfolioId")) -> bool:
         """Delete a portfolio"""
-        # TODO: Implement with database service
-        raise NotImplementedError("delete_portfolio mutation not implemented yet")
+        # Check if portfolio exists
+        if portfolio_id not in PORTFOLIOS:
+            raise Exception(f"Portfolio {portfolio_id} not found")
+        
+        # Delete the portfolio
+        del PORTFOLIOS[portfolio_id]
+        
+        return True
     
     @strawberry.mutation
     async def add_asset_to_portfolio(self, input: AddAssetInput) -> PortfolioAsset:
@@ -52,7 +58,24 @@ class Mutation:
         # Get current crypto price
         crypto_data = await crypto_api_service.get_cryptocurrency_by_id(input.crypto_id)
         if not crypto_data:
-            raise Exception(f"Cryptocurrency {input.crypto_id} not found")
+            # Fallback: Try to find the crypto in the markets data
+            markets_data = await crypto_api_service.get_cryptocurrencies(100)
+            crypto_match = next((crypto for crypto in markets_data if crypto.get("id") == input.crypto_id), None)
+            
+            if crypto_match:
+                # Convert markets data format to individual coin format
+                crypto_data = {
+                    "id": crypto_match.get("id"),
+                    "symbol": crypto_match.get("symbol"),
+                    "name": crypto_match.get("name"),
+                    "market_data": {
+                        "current_price": {
+                            "usd": crypto_match.get("current_price", 0)
+                        }
+                    }
+                }
+            else:
+                raise Exception(f"Cryptocurrency {input.crypto_id} not found")
         
         current_price = float(crypto_data.get("market_data", {}).get("current_price", {}).get("usd", 0))
         

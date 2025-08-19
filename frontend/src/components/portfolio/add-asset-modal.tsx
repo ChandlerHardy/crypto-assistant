@@ -95,17 +95,17 @@ export function AddAssetModal({ isOpen, onClose, portfolioId, portfolioName }: A
       onClick={onClose}
     >
       <div 
-        className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
+        className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold flex items-center">
+          <h2 className="text-xl font-bold flex items-center text-gray-900 dark:text-white">
             <Plus className="w-5 h-5 mr-2" />
             Add Asset to {portfolioName}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-gray-500 dark:text-gray-400"
           >
             <X className="w-4 h-4" />
           </button>
@@ -114,7 +114,7 @@ export function AddAssetModal({ isOpen, onClose, portfolioId, portfolioName }: A
         <form onSubmit={handleSubmit}>
           {/* Cryptocurrency Search */}
           <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Cryptocurrency *
             </label>
             <div className="relative">
@@ -131,14 +131,14 @@ export function AddAssetModal({ isOpen, onClose, portfolioId, portfolioName }: A
                 }}
                 onFocus={() => setShowDropdown(true)}
                 placeholder="Search for a cryptocurrency"
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
             </div>
             
             {/* Dropdown */}
             {showDropdown && searchTerm && filteredCryptos.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
                 {filteredCryptos.slice(0, 10).map((crypto) => (
                   <button
                     key={crypto.id}
