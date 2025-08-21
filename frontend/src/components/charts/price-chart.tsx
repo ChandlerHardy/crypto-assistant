@@ -30,7 +30,7 @@ export function PriceChart({ cryptoId, cryptoName, days = 7 }: PriceChartProps) 
 
   const { data, loading, error } = useQuery(GET_PRICE_HISTORY, {
     variables: { cryptoId, days: selectedDays },
-    pollInterval: 60000, // Refresh every minute
+    pollInterval: 300000, // Refresh every 5 minutes
   });
 
   // Close dropdown when clicking outside
