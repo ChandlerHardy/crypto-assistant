@@ -23,19 +23,22 @@ html {
   transition-duration: 150ms;
 }
 
-/* Ensure theme classes apply to the right elements */
-:root {
-  --background: 249 250 251;
-  --foreground: 17 24 39;
+/* High specificity theme styles to override Tailwind */
+html.light,
+html.light body,
+html:not(.dark),
+html:not(.dark) body {
+  background-color: #f9fafb !important; /* light gray */
+  color: #111827 !important; /* dark gray */
 }
 
-.dark {
-  --background: 17 24 39;
-  --foreground: 249 250 251;
+html.dark,
+html.dark body {
+  background-color: #111827 !important; /* dark gray */
+  color: #f9fafb !important; /* light gray */
 }
 
-/* Force the body background for theme switching */
-body {
-  background-color: rgb(var(--background));
-  color: rgb(var(--foreground));
+/* Ensure transitions work */
+html, body {
+  transition: background-color 0.2s ease, color 0.2s ease !important;
 }
