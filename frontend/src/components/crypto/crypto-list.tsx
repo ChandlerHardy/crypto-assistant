@@ -14,7 +14,7 @@ interface CryptoListProps {
 export function CryptoList({ limit = 20 }: CryptoListProps) {
   const { data, loading, error } = useQuery(GET_CRYPTOCURRENCIES, {
     variables: { limit },
-    pollInterval: 30000, // Refresh every 30 seconds
+    pollInterval: 300000, // Refresh every 5 minutes (reduce API load)
   });
 
   if (loading) {

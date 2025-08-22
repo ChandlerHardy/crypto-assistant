@@ -21,7 +21,7 @@ export function PortfolioOverview() {
   const [deleteConfirmPortfolio, setDeleteConfirmPortfolio] = useState<Portfolio | null>(null);
   
   const { data, loading, error, refetch } = useQuery(GET_PORTFOLIOS, {
-    pollInterval: 30000,
+    pollInterval: 120000, // Poll every 2 minutes (reduce API load)
   });
 
   const [createPortfolio, { loading: creating }] = useMutation(CREATE_PORTFOLIO, {

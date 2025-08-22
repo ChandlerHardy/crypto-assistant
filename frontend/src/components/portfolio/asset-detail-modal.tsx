@@ -24,7 +24,7 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
 
   // Fetch fresh portfolio data to get updated asset information
   const { data: portfolioData } = useQuery(GET_PORTFOLIOS, {
-    pollInterval: 5000, // Poll every 5 seconds for real-time updates
+    pollInterval: 60000, // Poll every minute (reduce API load)
   });
 
   // Find the current asset from fresh data
