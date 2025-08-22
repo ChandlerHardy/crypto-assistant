@@ -61,7 +61,7 @@ export function CryptoList({ limit = 20 }: CryptoListProps) {
               {error.message}
             </p>
             <p className="text-xs text-gray-400 mt-2">
-              Make sure your backend server is running at http://localhost:8000
+              Make sure your backend server is running and environment variables are set correctly
             </p>
           </div>
         </CardContent>
