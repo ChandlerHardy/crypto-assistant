@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { X, TrendingUp, TrendingDown, Plus, Minus, DollarSign } from 'lucide-react';
 import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
 import { ADD_TRANSACTION } from '@/lib/graphql/mutations';
-import { PortfolioAsset, AssetTransaction } from '@/types/crypto';
+import { PortfolioAsset, AssetTransaction, Portfolio } from '@/types/crypto';
 
 interface AssetDetailModalProps {
   isOpen: boolean;
@@ -29,8 +29,8 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
 
   // Find the current asset from fresh data
   const currentAsset = portfolioData?.portfolios
-    ?.find((p: any) => p.id === portfolioId)
-    ?.assets?.find((a: any) => a.id === asset?.id) || asset;
+    ?.find((p: Portfolio) => p.id === portfolioId)
+    ?.assets?.find((a: PortfolioAsset) => a.id === asset?.id) || asset;
 
   const [addTransaction, { loading }] = useMutation(ADD_TRANSACTION, {
     refetchQueries: [{ query: GET_PORTFOLIOS }],
@@ -77,7 +77,7 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
     });
   };
 
-  const sortedTransactions = currentAsset?.transactions?.slice().sort((a, b) => 
+  const sortedTransactions = currentAsset?.transactions?.slice().sort((a: AssetTransaction, b: AssetTransaction) => 
     new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   ) || [];
 
@@ -181,7 +181,7 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
                   No transactions yet
                 </p>
               ) : (
-                sortedTransactions.map((transaction) => (
+                sortedTransactions.map((transaction: AssetTransaction) => (
                   <div
                     key={transaction.id}
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"

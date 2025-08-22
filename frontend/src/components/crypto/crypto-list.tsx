@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
+import Image from 'next/image';
 import { GET_CRYPTOCURRENCIES } from '@/lib/graphql/queries';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { TrendingUp, TrendingDown } from 'lucide-react';
@@ -84,9 +85,11 @@ export function CryptoList({ limit = 20 }: CryptoListProps) {
             >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-full overflow-hidden">
-                  <img
+                  <Image
                     src={`https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/icon/${crypto.symbol.toLowerCase()}.png`}
                     alt={crypto.name}
+                    width={32}
+                    height={32}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       // Fallback to gradient circle with symbol

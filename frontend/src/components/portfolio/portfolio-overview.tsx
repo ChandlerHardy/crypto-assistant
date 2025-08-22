@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
-import { CREATE_PORTFOLIO, DELETE_PORTFOLIO, UPDATE_ASSET } from '@/lib/graphql/mutations';
+import { CREATE_PORTFOLIO, DELETE_PORTFOLIO } from '@/lib/graphql/mutations';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
 import { AssetDetailModal } from '@/components/portfolio/asset-detail-modal';
@@ -514,7 +514,7 @@ export function PortfolioOverview() {
             
             <div className="mb-6">
               <p className="text-gray-700 dark:text-gray-300 mb-2">
-                Are you sure you want to delete the portfolio <strong>"{deleteConfirmPortfolio.name}"</strong>?
+                Are you sure you want to delete the portfolio <strong>&quot;{deleteConfirmPortfolio.name}&quot;</strong>?
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 This action cannot be undone. All assets in this portfolio will be permanently removed.

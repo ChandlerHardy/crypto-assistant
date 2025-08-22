@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { X, Plus, Search } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+// import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { GET_CRYPTOCURRENCIES, GET_PORTFOLIOS } from '@/lib/graphql/queries';
 import { ADD_ASSET_TO_PORTFOLIO } from '@/lib/graphql/mutations';
 import { CryptoCurrency } from '@/types/crypto';
