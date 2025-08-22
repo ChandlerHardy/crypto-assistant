@@ -1,8 +1,9 @@
 import strawberry
 from typing import List, Optional
 from datetime import datetime
-from app.schemas.types import CryptoCurrency, Portfolio, PriceData
+from app.schemas.types import CryptoCurrency, Portfolio, PortfolioAsset, AssetTransaction, PriceData
 from app.services.crypto_api import crypto_api_service
+from app.services.database_service import DatabaseService
 
 @strawberry.type
 class Query:
@@ -90,14 +91,109 @@ class Query:
     @strawberry.field
     async def portfolios(self) -> List[Portfolio]:
         """Get all user portfolios"""
-        from app.schemas.mutations import PORTFOLIOS
-        return list(PORTFOLIOS.values())
+        with DatabaseService() as db_service:
+            portfolio_models = db_service.get_all_portfolios()
+            portfolios = []
+            
+            for portfolio_model in portfolio_models:
+                # Convert assets to GraphQL types
+                assets = []
+                for asset_model in portfolio_model.assets:
+                    # Get transactions for this asset
+                    transaction_models = db_service.get_asset_transactions(asset_model.id)
+                    transactions = [
+                        AssetTransaction(
+                            id=t.id,
+                            transaction_type=t.transaction_type,
+                            amount=t.amount,
+                            price_per_unit=t.price_per_unit,
+                            total_value=t.total_value,
+                            timestamp=t.timestamp,
+                            notes=t.notes
+                        ) for t in transaction_models
+                    ]
+                    
+                    asset = PortfolioAsset(
+                        id=asset_model.id,
+                        crypto_id=asset_model.crypto_id,
+                        symbol=asset_model.symbol,
+                        name=asset_model.name,
+                        amount=asset_model.amount,
+                        average_buy_price=asset_model.average_buy_price,
+                        current_price=asset_model.current_price,
+                        total_value=asset_model.total_value,
+                        profit_loss=asset_model.profit_loss,
+                        profit_loss_percentage=asset_model.profit_loss_percentage,
+                        transactions=transactions
+                    )
+                    assets.append(asset)
+                
+                portfolio = Portfolio(
+                    id=portfolio_model.id,
+                    name=portfolio_model.name,
+                    description=portfolio_model.description,
+                    total_value=portfolio_model.total_value,
+                    total_profit_loss=portfolio_model.total_profit_loss,
+                    total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
+                    assets=assets,
+                    created_at=portfolio_model.created_at,
+                    updated_at=portfolio_model.updated_at
+                )
+                portfolios.append(portfolio)
+            
+            return portfolios
     
     @strawberry.field
     async def portfolio(self, id: str) -> Optional[Portfolio]:
         """Get specific portfolio by ID"""
-        # TODO: Implement with database service
-        return None
+        with DatabaseService() as db_service:
+            portfolio_model = db_service.get_portfolio(id)
+            if not portfolio_model:
+                return None
+            
+            # Convert assets to GraphQL types
+            assets = []
+            for asset_model in portfolio_model.assets:
+                # Get transactions for this asset
+                transaction_models = db_service.get_asset_transactions(asset_model.id)
+                transactions = [
+                    AssetTransaction(
+                        id=t.id,
+                        transaction_type=t.transaction_type,
+                        amount=t.amount,
+                        price_per_unit=t.price_per_unit,
+                        total_value=t.total_value,
+                        timestamp=t.timestamp,
+                        notes=t.notes
+                    ) for t in transaction_models
+                ]
+                
+                asset = PortfolioAsset(
+                    id=asset_model.id,
+                    crypto_id=asset_model.crypto_id,
+                    symbol=asset_model.symbol,
+                    name=asset_model.name,
+                    amount=asset_model.amount,
+                    average_buy_price=asset_model.average_buy_price,
+                    current_price=asset_model.current_price,
+                    total_value=asset_model.total_value,
+                    profit_loss=asset_model.profit_loss,
+                    profit_loss_percentage=asset_model.profit_loss_percentage,
+                    transactions=transactions
+                )
+                assets.append(asset)
+            
+            return Portfolio(
+                id=portfolio_model.id,
+                name=portfolio_model.name,
+                description=portfolio_model.description,
+                total_value=portfolio_model.total_value,
+                total_profit_loss=portfolio_model.total_profit_loss,
+                total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
+                assets=assets,
+                created_at=portfolio_model.created_at,
+                updated_at=portfolio_model.updated_at
+            )
     
     @strawberry.field
     async def priceHistory(
