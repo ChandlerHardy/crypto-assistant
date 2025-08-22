@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,8 +13,13 @@ export function ThemeToggle() {
   }, []);
 
   const handleToggle = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
+    if (theme === 'system') {
+      // If currently system, switch to the opposite of current appearance
+      setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    } else {
+      // If manually set, toggle between light and dark
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+    }
   };
 
   if (!mounted) {
@@ -25,13 +30,16 @@ export function ThemeToggle() {
     );
   }
 
+  const isDark = resolvedTheme === 'dark';
+
   return (
     <button
       onClick={handleToggle}
-      className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      aria-label="Toggle theme"
+      className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-200 dark:border-gray-700"
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
-      {theme === 'dark' ? (
+      {isDark ? (
         <Sun className="w-4 h-4 text-gray-600 dark:text-gray-300" />
       ) : (
         <Moon className="w-4 h-4 text-gray-600 dark:text-gray-300" />

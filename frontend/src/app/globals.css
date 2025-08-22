@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent theme flashing and ensure smooth transitions */
+html {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 /* Ensure dark mode classes work properly */
 .dark {
   color-scheme: dark;
@@ -9,4 +14,20 @@
 
 .light {
   color-scheme: light;
+}
+
+/* Fix hydration issues with theme transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Prevent layout shift during theme switch */
+body {
+  background-color: rgb(249 250 251); /* light mode default */
+}
+
+.dark body {
+  background-color: rgb(17 24 39); /* dark mode default */
 }
