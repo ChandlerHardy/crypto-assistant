@@ -5,15 +5,49 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Ensure theme is applied correctly on mount
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('crypto-analyzer-theme') || 'light';
+      const html = document.documentElement;
+      const body = document.body;
+      
+      html.classList.remove('light', 'dark');
+      body.classList.remove('light', 'dark');
+      html.classList.add(storedTheme);
+      body.classList.add(storedTheme);
+      
+      console.log('Theme initialized:', storedTheme);
+    }
   }, []);
 
   const handleToggle = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    
+    // Force DOM update immediately for production builds
+    if (typeof window !== 'undefined') {
+      const html = document.documentElement;
+      const body = document.body;
+      
+      // Remove all theme classes
+      html.classList.remove('light', 'dark');
+      body.classList.remove('light', 'dark');
+      
+      // Add new theme class
+      html.classList.add(newTheme);
+      body.classList.add(newTheme);
+      
+      // Also update localStorage directly
+      localStorage.setItem('crypto-analyzer-theme', newTheme);
+      
+      console.log('Theme changed to:', newTheme, 'HTML classes:', html.className);
+    }
   };
 
   if (!mounted) {
