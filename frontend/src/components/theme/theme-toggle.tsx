@@ -13,13 +13,7 @@ export function ThemeToggle() {
   }, []);
 
   const handleToggle = () => {
-    if (theme === 'system') {
-      // If currently system, switch to the opposite of current appearance
-      setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
-    } else {
-      // If manually set, toggle between light and dark
-      setTheme(theme === 'dark' ? 'light' : 'dark');
-    }
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   if (!mounted) {
@@ -30,7 +24,7 @@ export function ThemeToggle() {
     );
   }
 
-  const isDark = resolvedTheme === 'dark';
+  const isDark = theme === 'dark';
 
   return (
     <button

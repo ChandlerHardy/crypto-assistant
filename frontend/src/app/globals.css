@@ -23,11 +23,19 @@ html {
   transition-duration: 150ms;
 }
 
-/* Prevent layout shift during theme switch */
-body {
-  background-color: rgb(249 250 251); /* light mode default */
+/* Ensure theme classes apply to the right elements */
+:root {
+  --background: 249 250 251;
+  --foreground: 17 24 39;
 }
 
-.dark body {
-  background-color: rgb(17 24 39); /* dark mode default */
+.dark {
+  --background: 17 24 39;
+  --foreground: 249 250 251;
+}
+
+/* Force the body background for theme switching */
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
 }
