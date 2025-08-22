@@ -25,8 +25,8 @@ class CryptoAPIService:
         
         headers = {}
         if settings.coingecko_api_key:
-            # Use Pro API if key is available
-            headers["x-cg-demo-api-key"] = settings.coingecko_api_key
+            # Use Demo API key for higher rate limits
+            headers["X-CG-Demo-API-Key"] = settings.coingecko_api_key
         
         try:
             response = await self.client.get(url, params=params, headers=headers)
@@ -51,7 +51,7 @@ class CryptoAPIService:
         
         try:
             if settings.coingecko_api_key:
-                headers = {"X-CG-Pro-API-Key": settings.coingecko_api_key}
+                headers = {"X-CG-Demo-API-Key": settings.coingecko_api_key}
                 response = await self.client.get(url, params=params, headers=headers)
             else:
                 response = await self.client.get(url, params=params)
@@ -80,7 +80,7 @@ class CryptoAPIService:
         
         headers = {}
         if settings.coingecko_api_key:
-            headers["x-cg-demo-api-key"] = settings.coingecko_api_key
+            headers["X-CG-Demo-API-Key"] = settings.coingecko_api_key
         
         try:
             response = await self.client.get(url, params=params, headers=headers)
