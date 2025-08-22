@@ -84,7 +84,7 @@ export function CryptoList({ limit = 20 }: CryptoListProps) {
               className="flex items-center justify-between py-3 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
             >
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-full overflow-hidden">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <Image
                     src={`https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/icon/${crypto.symbol.toLowerCase()}.png`}
                     alt={crypto.name}
@@ -94,7 +94,12 @@ export function CryptoList({ limit = 20 }: CryptoListProps) {
                     unoptimized
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.src = `https://via.placeholder.com/32x32/6366f1/ffffff?text=${crypto.symbol.charAt(0)}`;
+                      const container = target.parentElement;
+                      if (container && !target.dataset.fallbackApplied) {
+                        target.style.display = 'none';
+                        target.dataset.fallbackApplied = 'true';
+                        container.innerHTML = `<span class="text-white text-xs font-bold">${crypto.symbol.charAt(0).toUpperCase()}</span>`;
+                      }
                     }}
                   />
                 </div>
