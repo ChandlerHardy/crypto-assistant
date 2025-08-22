@@ -91,21 +91,12 @@ export function CryptoList({ limit = 20 }: CryptoListProps) {
                     width={32}
                     height={32}
                     className="w-full h-full object-cover"
+                    unoptimized
                     onError={(e) => {
-                      // Fallback to gradient circle with symbol
                       const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallbackDiv = target.nextElementSibling as HTMLDivElement;
-                      if (fallbackDiv) {
-                        fallbackDiv.style.display = 'flex';
-                      }
+                      target.src = `https://via.placeholder.com/32x32/6366f1/ffffff?text=${crypto.symbol.charAt(0)}`;
                     }}
                   />
-                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center" style={{ display: 'none' }}>
-                    <span className="text-white text-xs font-bold">
-                      {crypto.symbol.slice(0, 2).toUpperCase()}
-                    </span>
-                  </div>
                 </div>
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">{crypto.name}</div>
