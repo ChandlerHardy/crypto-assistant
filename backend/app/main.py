@@ -28,7 +28,7 @@ app.add_middleware(
 
 # GraphQL endpoint
 graphql_app = GraphQLRouter(schema)
-app.include_router(graphql_app, prefix="/graphql")
+app.include_router(graphql_app, prefix="/cryptassist/graphql")
 
 @app.get("/")
 async def root():
