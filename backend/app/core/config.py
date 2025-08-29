@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     # External API Keys
     coinmarketcap_api_key: Optional[str] = None
     coingecko_api_key: Optional[str] = None
+    github_token: Optional[str] = None
     
     # Environment
     environment: str = "development"

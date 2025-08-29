@@ -1,5 +1,5 @@
 import strawberry
-from typing import Optional
+from typing import Optional, List, Dict
 from datetime import datetime
 import uuid
 from app.schemas.types import Portfolio, PortfolioAsset, AssetTransaction, CreatePortfolioInput, AddAssetInput, UpdateAssetInput, AddTransactionInput
@@ -257,3 +257,100 @@ class Mutation:
                 timestamp=transaction_model.timestamp,
                 notes=transaction_model.notes
             )
+    
+    @strawberry.mutation
+    async def get_portfolio_advice(self, portfolio_id: str = strawberry.argument(name="portfolioId")) -> str:
+        """Get AI-powered advice for a specific portfolio"""
+        try:
+            from app.services.ai_service import ai_service
+            
+            with DatabaseService() as db_service:
+                # Get portfolio data
+                portfolio_model = db_service.get_portfolio(portfolio_id)
+                if not portfolio_model:
+                    raise Exception(f"Portfolio {portfolio_id} not found")
+                
+                # Get assets with current prices
+                assets = db_service.get_portfolio_assets(portfolio_id)
+                
+                # Format portfolio data
+                portfolio_data = {
+                    "total_value": float(portfolio_model.total_value or 0),
+                    "assets": []
+                }
+                
+                for asset in assets:
+                    portfolio_data["assets"].append({
+                        "symbol": asset.symbol,
+                        "amount": float(asset.amount or 0),
+                        "current_price": float(asset.current_price or 0),
+                        "total_value": float(asset.total_value or 0),
+                        "profit_loss": float(asset.profit_loss or 0),
+                        "profit_loss_percentage": float(asset.profit_loss_percentage or 0)
+                    })
+                
+                # Get AI advice
+                advice = await ai_service.get_portfolio_advice(portfolio_data)
+                return advice
+                
+        except Exception as e:
+            # Return user-friendly error message
+            return f"I apologize, but I'm unable to provide advice at the moment due to a technical issue: {str(e)}. Please try again later or check that your GitHub token is properly configured."
+    
+    @strawberry.mutation
+    async def chat_with_assistant(self, message: str, context: Optional[str] = None) -> str:
+        """Chat with the AI assistant about crypto and portfolio management"""
+        try:
+            from app.services.ai_service import ai_service
+            
+            system_prompt = """You are CryptoAssist, an expert cryptocurrency advisor with access to real-time market data. You provide current, actionable insights about:
+
+- Current cryptocurrency prices, trends, and market movements  
+- Portfolio allocation strategies based on current market conditions
+- DeFi protocols, staking opportunities, and yield farming
+- Trading patterns, market cycles, and entry/exit strategies
+- Blockchain technology, tokenomics, and project evaluation
+- Real-time market sentiment and macro factors
+
+**IMPORTANT**: You have access to current, real-time market data provided in the system messages. Always use this current data in your analysis rather than outdated information from your training. Reference current prices, recent price movements, and today's market sentiment.
+
+You can:
+- Analyze current market conditions and provide timely insights
+- Discuss specific cryptocurrencies using their current prices and trends
+- Explain current market movements and what's driving them today
+- Recommend actions based on real-time market data
+- Share insights about current market cycles and timing
+- Compare current prices to historical levels and trends
+
+Always include this disclaimer: "This is educational information and market analysis based on current data, not personalized financial advice. Cryptocurrency investments carry high risk and volatility. Only invest what you can afford to lose and always conduct your own research (DYOR) before making investment decisions."
+
+Be detailed, analytical, and focus on current market conditions with specific, timely insights."""
+
+            # Get current market data for context
+            market_context = await ai_service.get_current_market_context()
+            
+            # Build messages array
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": market_context}
+            ]
+            
+            # Add additional context if provided
+            if context:
+                messages.append({
+                    "role": "system", 
+                    "content": f"Additional context: {context}"
+                })
+            
+            # Add user message
+            messages.append({
+                "role": "user", 
+                "content": message
+            })
+            
+            # Get AI response
+            response = await ai_service.chat_completion(messages, temperature=0.7)
+            return response
+            
+        except Exception as e:
+            return f"I apologize, but I'm experiencing technical difficulties right now: {str(e)}. Please try again in a moment!"

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Wallet, Settings, Menu } from 'lucide-react';
+import { Wallet, Settings, Menu, Bot } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export function Header() {
@@ -32,6 +32,13 @@ export function Header() {
           >
             <Wallet className="h-4 w-4" />
             <span>Portfolio</span>
+          </Link>
+          <Link 
+            href="/assistant" 
+            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium flex items-center space-x-1"
+          >
+            <Bot className="h-4 w-4" />
+            <span>AI Assistant</span>
           </Link>
           <Link 
             href="/settings" 
