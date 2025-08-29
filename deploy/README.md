@@ -43,9 +43,15 @@ Example:
 ## After Deployment
 
 Your application will be accessible at:
-- **Frontend**: `http://YOUR_OCI_IP:3000`
+- **Frontend**: `https://cryptassist.yourdomain.com` (Vercel)
+- **Backend API**: `https://backend.yourdomain.com`
+- **GraphQL Playground**: `https://backend.yourdomain.com/cryptassist/graphql`
+- **Health Check**: `https://backend.yourdomain.com/health`
+
+**Local Development:**
+- **Frontend**: `http://localhost:3000`
 - **Backend API**: `http://YOUR_OCI_IP:8000`
-- **GraphQL Playground**: `http://YOUR_OCI_IP:8000/graphql`
+- **GraphQL Playground**: `http://YOUR_OCI_IP:8000/cryptassist/graphql`
 
 ## Managing Your Deployment
 
@@ -83,9 +89,9 @@ The deployment uses these environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CORS_ORIGINS` | `http://localhost:3000` | Allowed frontend origins |
+| `CORS_ORIGINS` | `http://localhost:3000,https://cryptassist.yourdomain.com` | Allowed frontend origins |
 | `COINGECKO_API_KEY` | _(empty)_ | Optional API key for higher rate limits |
-| `NEXT_PUBLIC_GRAPHQL_URL` | `http://localhost:8000/graphql` | Backend GraphQL endpoint |
+| `NEXT_PUBLIC_GRAPHQL_URL` | `https://backend.yourdomain.com/cryptassist/graphql` | Backend GraphQL endpoint |
 
 ## Troubleshooting
 
@@ -127,12 +133,28 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
-## Next Steps
+## Production Domain Setup
 
-- **Domain Setup**: Configure a domain name and set up SSL certificates
+### Custom Domain Configuration
+1. **Configure DNS Records**:
+   ```
+   Type: A, Host: backend, Value: YOUR_OCI_IP
+   Type: CNAME, Host: cryptassist, Value: cname.vercel-dns.com
+   ```
+
+2. **Set up SSL**:
+   ```bash
+   ./deploy/setup-ssl.sh YOUR_OCI_IP backend.yourdomain.com
+   ```
+
+3. **Configure Vercel Custom Domain**:
+   - Add `cryptassist.yourdomain.com` to Vercel project
+   - Update environment variable: `NEXT_PUBLIC_GRAPHQL_URL=https://backend.yourdomain.com/cryptassist/graphql`
+
+### Next Steps
 - **Monitoring**: Set up logging and monitoring for production
-- **Backup**: Configure database backups if you add persistent storage
-- **CDN**: Use OCI Object Storage + CDN for static assets
+- **Backup**: Configure database backups for persistent storage
+- **Performance**: Consider CDN for static assets
 
 ## Cost Optimization
 

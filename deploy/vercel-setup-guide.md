@@ -1,114 +1,126 @@
-# Vercel + OCI Backend Setup Guide
+# Custom Domain Setup Guide
 
-This guide covers deploying your frontend to Vercel while running the backend on your OCI instance.
+This guide covers setting up custom domains for your crypto assistant application deployed on Vercel + OCI.
+
+## Current Production Setup
+
+**Live URLs:**
+- **Portfolio**: `https://chandlerhardy.com`
+- **Crypto App**: `https://cryptassist.chandlerhardy.com`
+- **Backend API**: `https://backend.chandlerhardy.com/cryptassist/*`
 
 ## Architecture Overview
 
 ```
-┌─────────────────┐    HTTPS    ┌─────────────────┐    HTTP     ┌─────────────────┐
+┌─────────────────┐    HTTPS    ┌─────────────────┐    HTTPS    ┌─────────────────┐
 │                 │ ──────────► │                 │ ─────────► │                 │
-│  User Browser   │             │  Vercel (CDN)   │            │  OCI Backend    │
-│                 │ ◄────────── │  Frontend       │ ◄───────── │  (GraphQL API)  │
+│  User Browser   │             │  Vercel (CDN)   │            │ OCI + nginx +   │
+│                 │ ◄────────── │  Custom Domains │ ◄───────── │ Let's Encrypt   │
 └─────────────────┘             └─────────────────┘            └─────────────────┘
 ```
 
 ## Step-by-Step Setup
 
-### 1. Deploy Backend to OCI
+### 1. Deploy Backend to OCI with Custom Domain
 
-First, deploy your backend to your OCI instance:
+Deploy your backend and set up SSL:
 
 ```bash
-# Deploy backend only
+# Deploy backend with new GraphQL path
 ./deploy/deploy-backend-to-oci.sh YOUR_OCI_IP
 
-# Example:
-./deploy/deploy-backend-to-oci.sh 129.153.XXX.XXX
+# Set up SSL and nginx reverse proxy
+./deploy/setup-ssl.sh YOUR_OCI_IP backend.yourdomain.com
 ```
 
-This will:
-- Deploy only the FastAPI backend to OCI
-- Make it accessible at `http://YOUR_OCI_IP:8000`
-- Set up GraphQL at `http://YOUR_OCI_IP:8000/graphql`
+### 2. Configure DNS Records
 
-### 2. Update Vercel Environment Variables
+In your domain registrar (Namecheap), add these DNS records:
 
-In your Vercel dashboard:
+```
+# Backend subdomain
+Type: A
+Host: backend
+Value: YOUR_OCI_IP
 
-1. Go to your project settings
-2. Navigate to "Environment Variables"
-3. Update or add:
+# Crypto app subdomain 
+Type: CNAME
+Host: cryptassist
+Value: cname.vercel-dns.com
 
+# Main domain (portfolio)
+Type: A 
+Name: @
+Value: [Vercel provided IP]
+```
+
+### 3. Set up Custom Domains in Vercel
+
+**For Crypto App:**
+1. Go to crypto app project in Vercel
+2. Settings → Domains
+3. Add `cryptassist.yourdomain.com`
+
+**For Portfolio:**
+1. Go to portfolio project in Vercel  
+2. Settings → Domains
+3. Add `yourdomain.com`
+
+### 4. Update Environment Variables
+
+**Crypto App (Vercel):**
 ```env
-NEXT_PUBLIC_GRAPHQL_URL=http://YOUR_OCI_IP:8000/graphql
+NEXT_PUBLIC_GRAPHQL_URL=https://backend.yourdomain.com/cryptassist/graphql
 ```
 
-**Replace `YOUR_OCI_IP` with your actual OCI instance IP**
-
-### 3. Update Backend CORS Configuration
-
-You'll need to update your backend to allow requests from Vercel:
-
-**Option A: Set via Environment Variable on OCI**
+**Backend (OCI):**
 ```bash
-# SSH to your OCI instance
+# SSH to OCI instance
 ssh ubuntu@YOUR_OCI_IP
-
-# Update environment and restart
 cd crypto-assistant
-echo "CORS_ORIGINS=https://your-vercel-app.vercel.app,http://localhost:3000" > .env
-docker-compose -f docker-compose.backend.yml restart
+echo "CORS_ORIGINS=http://localhost:3000,https://cryptassist.yourdomain.com,https://yourdomain.com" > .env
+docker-compose -f docker-compose.backend.yml restart backend
 ```
-
-**Option B: Update main.py directly**
-Edit `backend/app/main.py` and add your Vercel URL to the CORS origins:
-
-```python
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://your-vercel-app.vercel.app").split(",")
-```
-
-### 4. Deploy/Redeploy Frontend to Vercel
-
-If your project isn't on Vercel yet:
-
-1. **Connect GitHub** to Vercel
-2. **Import your repository**
-3. **Set Root Directory**: `frontend`
-4. **Add Environment Variable**: `NEXT_PUBLIC_GRAPHQL_URL=http://YOUR_OCI_IP:8000/graphql`
-5. **Deploy**
-
-If already deployed, just redeploy to pick up the new environment variable.
 
 ## Required OCI Security Group Rules
 
-Only need to open port 8000 for the backend:
+Need to open ports for HTTP, HTTPS, and SSH:
 
 | Protocol | Port | Source CIDR | Description |
 |----------|------|-------------|-------------|
 | TCP | 22 | YOUR_IP/32 | SSH Access |
-| TCP | 8000 | 0.0.0.0/0 | Backend API |
+| TCP | 80 | 0.0.0.0/0 | HTTP (for Let's Encrypt) |
+| TCP | 443 | 0.0.0.0/0 | HTTPS (SSL traffic) |
+| TCP | 8000 | 0.0.0.0/0 | Backend API (internal) |
 
 ## Testing Your Setup
 
-### 1. Test Backend Directly
+### 1. Test Backend with SSL
 ```bash
-curl http://YOUR_OCI_IP:8000/health
-curl http://YOUR_OCI_IP:8000/graphql
+curl https://backend.yourdomain.com/health
+curl https://backend.yourdomain.com/cryptassist/graphql
 ```
 
 ### 2. Test Frontend Connection
-1. Visit your Vercel app URL
+1. Visit `https://cryptassist.yourdomain.com`
 2. Open browser developer tools
-3. Check Network tab for GraphQL requests to your OCI backend
-4. Verify no CORS errors in console
+3. Check Network tab for GraphQL requests to HTTPS backend
+4. Verify no CORS or mixed content errors in console
+
+### 3. Test DNS Propagation
+```bash
+nslookup backend.yourdomain.com
+nslookup cryptassist.yourdomain.com
+```
 
 ## Benefits of This Architecture
 
-✅ **Best of Both Worlds**: Vercel's CDN + your always-on backend  
-✅ **Cost Effective**: Free Vercel frontend + minimal OCI backend  
-✅ **No Cold Starts**: Backend stays warm on OCI  
-✅ **Easy Updates**: Deploy backend and frontend independently  
-✅ **Better Performance**: Frontend served from global CDN  
+✅ **Professional Setup**: Custom domains with SSL certificates  
+✅ **Clean URLs**: Subdomain separation for different services  
+✅ **Free SSL**: Let's Encrypt certificates with auto-renewal  
+✅ **Global CDN**: Vercel's edge network for fast loading  
+✅ **Always-On Backend**: No cold starts on OCI  
+✅ **Cost Effective**: Free Vercel + free OCI tier = $0/month  
 
 ## Troubleshooting
 

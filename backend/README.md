@@ -39,7 +39,13 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## API Endpoints
 
-- **GraphQL Playground**: http://localhost:8000/graphql
+**Production:**
+- **GraphQL Playground**: https://backend.chandlerhardy.com/cryptassist/graphql
+- **Health Check**: https://backend.chandlerhardy.com/health
+- **API Root**: https://backend.chandlerhardy.com
+
+**Local Development:**
+- **GraphQL Playground**: http://localhost:8000/cryptassist/graphql
 - **Health Check**: http://localhost:8000/health
 - **API Docs**: http://localhost:8000/docs
 

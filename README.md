@@ -54,8 +54,16 @@ uvicorn app.main:app --reload
 ```
 
 ### Access Points
+
+**Production:**
+- **Frontend**: https://cryptassist.chandlerhardy.com
+- **Portfolio**: https://chandlerhardy.com  
+- **GraphQL Playground**: https://backend.chandlerhardy.com/cryptassist/graphql
+- **API Health**: https://backend.chandlerhardy.com/health
+
+**Local Development:**
 - **Frontend**: http://localhost:3000
-- **GraphQL Playground**: http://localhost:8000/graphql
+- **GraphQL Playground**: http://localhost:8000/cryptassist/graphql
 - **API Documentation**: http://localhost:8000/docs
 
 ## Project Structure
@@ -97,7 +105,7 @@ SECRET_KEY=your-secret-key
 
 Frontend (`.env.local`):
 ```bash
-NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:8000/graphql
+NEXT_PUBLIC_GRAPHQL_URL=http://localhost:8000/cryptassist/graphql
 ```
 
 ### Available Scripts
@@ -111,6 +119,25 @@ NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:8000/graphql
 - `uvicorn app.main:app --reload` - Start development server
 - `pytest` - Run tests
 - `alembic upgrade head` - Run database migrations
+
+## Deployment
+
+### Production Setup
+The application is deployed with the following architecture:
+- **Frontend**: Deployed on Vercel at `cryptassist.chandlerhardy.com`
+- **Backend**: Self-hosted on Oracle Cloud Infrastructure at `backend.chandlerhardy.com`
+- **Database**: PostgreSQL running in Docker on OCI
+- **SSL**: Free Let's Encrypt certificates with auto-renewal
+- **Reverse Proxy**: Nginx handling HTTPS termination
+
+### Deploy to OCI
+```bash
+# Deploy backend to Oracle Cloud
+./deploy/deploy-backend-to-oci.sh YOUR_OCI_IP
+
+# Set up SSL certificates
+./deploy/setup-ssl.sh YOUR_OCI_IP backend.yourdomain.com
+```
 
 ## API Examples
 
