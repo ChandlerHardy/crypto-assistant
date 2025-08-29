@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { TrendingUp, Wallet, Settings, Menu } from 'lucide-react';
+import Image from 'next/image';
+import { Wallet, Settings, Menu } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export function Header() {
@@ -9,12 +10,13 @@ export function Header() {
     <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Crypto Portfolio
-            </h1>
-          </div>
+          <Image
+            src="/cryptassist-transparent-bg.png"
+            alt="Crypto Portfolio"
+            width={240}
+            height={60}
+            className="h-15"
+          />
         </div>
         
         <nav className="hidden md:flex items-center space-x-6">
