@@ -10,44 +10,12 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    
-    // Ensure theme is applied correctly on mount
-    if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('crypto-analyzer-theme') || 'light';
-      const html = document.documentElement;
-      const body = document.body;
-      
-      html.classList.remove('light', 'dark');
-      body.classList.remove('light', 'dark');
-      html.classList.add(storedTheme);
-      body.classList.add(storedTheme);
-      
-      console.log('Theme initialized:', storedTheme);
-    }
   }, []);
 
   const handleToggle = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
-    
-    // Force DOM update immediately for production builds
-    if (typeof window !== 'undefined') {
-      const html = document.documentElement;
-      const body = document.body;
-      
-      // Remove all theme classes
-      html.classList.remove('light', 'dark');
-      body.classList.remove('light', 'dark');
-      
-      // Add new theme class
-      html.classList.add(newTheme);
-      body.classList.add(newTheme);
-      
-      // Also update localStorage directly
-      localStorage.setItem('crypto-analyzer-theme', newTheme);
-      
-      console.log('Theme changed to:', newTheme, 'HTML classes:', html.className);
-    }
+    console.log('Theme toggled to:', newTheme);
   };
 
   if (!mounted) {
