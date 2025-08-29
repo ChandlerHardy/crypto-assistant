@@ -32,7 +32,7 @@ A comprehensive cryptocurrency portfolio management application with real-time m
 - **CoinGecko API** for crypto market data
 - **Cryptocurrency Icons CDN** for coin logos
 
-## 🚀 Recommended Deployment Strategy
+## 🚀 Current Deployment Strategy
 
 ### Frontend: Vercel (Free)
 - Perfect for Next.js applications
@@ -40,102 +40,105 @@ A comprehensive cryptocurrency portfolio management application with real-time m
 - Built-in CDN and edge functions
 - Custom domains and SSL included
 
-### Backend: Render (Free)
-- Easy Python deployment
-- Free PostgreSQL database included
-- Automatic SSL certificates
-- GitHub integration for auto-deploys
+### Backend: Oracle Cloud Infrastructure (Free)
+- **VM.Standard.A1.Flex** ARM-based compute instance
+- **Docker containerized** FastAPI backend
+- **PostgreSQL 15** database in Docker container
+- **No cold starts** - always running
+- **Always Free Tier** - up to 4 ARM OCPUs and 24GB RAM
 
 **Total Cost: $0/month**
 
-## 📝 Pre-Deployment Tasks
+## 🔗 Live Application
 
-### 1. Database Migration
-**Current State:** In-memory Python dictionaries  
-**Needs:** PostgreSQL or SQLite for persistence
+- **Frontend**: https://crypto-portfolio-frontend-lovat.vercel.app/
+- **Backend API**: http://150.136.38.166:8000
+- **GraphQL Playground**: http://150.136.38.166:8000/graphql
 
-**Files to Update:**
-- `backend/app/schemas/mutations.py` - Replace `PORTFOLIOS = {}` with database operations
-- Add database models/schemas
-- Add database connection setup
+## ✅ Deployment Status
 
-### 2. Environment Configuration
+### Database Setup ✅
+**Current State:** PostgreSQL 15 running in Docker container on OCI  
+**Features:**
+- Persistent data storage with Docker volumes
+- Connection pooling and health checks
+- Production-ready database setup
 
-**Backend Environment Variables:**
+### Environment Configuration ✅
+
+**Backend Environment Variables (On OCI):**
 ```env
-DATABASE_URL=postgresql://user:pass@host:port/dbname
+DATABASE_URL=postgresql://crypto_user:crypto_secure_password_2024@postgres:5432/crypto_portfolio
 COINGECKO_API_KEY=optional_api_key
-CORS_ORIGINS=https://your-vercel-app.vercel.app,http://localhost:3000
+CORS_ORIGINS=https://crypto-portfolio-frontend-lovat.vercel.app,http://localhost:3000
 ```
 
-**Frontend Environment Variables:**
+**Frontend Environment Variables (Vercel):**
 ```env
-NEXT_PUBLIC_GRAPHQL_URL=https://your-backend.onrender.com/graphql
+NEXT_PUBLIC_GRAPHQL_URL=http://150.136.38.166:8000/graphql
 ```
 
-### 3. CORS Configuration
-Update `backend/app/main.py`:
+### CORS Configuration ✅
+**Current Setup:** Environment-based CORS configuration
 ```python
+# In backend/app/main.py
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Development
-        "https://your-app.vercel.app"  # Production
-    ],
+    allow_origins=cors_origins,  # Configured via environment variable
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 ```
 
-### 4. Create Deployment Files
+### Deployment Files ✅
 
-**backend/requirements.txt:**
+**Created deployment infrastructure:**
+- `backend/Dockerfile` - Containerized backend with ARM64 support
+- `docker-compose.backend-postgres.yml` - Production PostgreSQL + backend setup
+- `deploy/deploy-backend-to-oci.sh` - Automated deployment script  
+- `deploy/README.md` - Complete deployment documentation
+- `.env.example` - Environment variables template
+
+**Key Features:**
+- ARM64-optimized for OCI A1.Flex instances
+- Health checks and auto-restart policies
+- Persistent PostgreSQL data storage
+- SSH key-based deployment automation
+
+## 🔄 Migration Complete ✅
+
+### Backend Deployment (Oracle Cloud Infrastructure)
+**Status:** ✅ **DEPLOYED AND RUNNING**
+
+**Deployment Command:**
+```bash
+./deploy/deploy-backend-to-oci.sh 150.136.38.166
 ```
-fastapi==0.104.1
-strawberry-graphql==0.216.1
-uvicorn[standard]==0.24.0
-httpx==0.25.1
-python-multipart==0.0.6
-psycopg2-binary==2.9.7  # For PostgreSQL
-```
 
-**backend/Procfile (for Render):**
-```
-web: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
+**Services Running:**
+- FastAPI backend on port 8000
+- PostgreSQL 15 database  
+- Docker containerized with health checks
+- Always-on (no cold starts)
 
-## 🔄 Deployment Steps
+### Frontend Deployment (Vercel)
+**Status:** ✅ **DEPLOYED**
 
-### Phase 1: Backend Deployment (Render)
-1. **Create Render account** and connect GitHub
-2. **Create new Web Service** from your repository
-3. **Configure build settings:**
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - Root Directory: `backend`
-4. **Add PostgreSQL database** (free add-on)
-5. **Set environment variables** in Render dashboard
-6. **Deploy and test** GraphQL endpoint
+**Live URL:** https://crypto-portfolio-frontend-lovat.vercel.app/
 
-### Phase 2: Frontend Deployment (Vercel)
-1. **Create Vercel account** and connect GitHub
-2. **Import project** from repository
-3. **Configure build settings:**
-   - Framework: Next.js
-   - Root Directory: `frontend`
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
-4. **Set environment variables:**
-   - `NEXT_PUBLIC_GRAPHQL_URL=https://your-backend.onrender.com/graphql`
-5. **Deploy and test** application
+**Configuration:**
+- Auto-deploys from main branch
+- Environment variable: `NEXT_PUBLIC_GRAPHQL_URL=http://150.136.38.166:8000/graphql`
+- CORS configured for HTTPS requests
 
-### Phase 3: Testing & Optimization
-1. **Test all functionality** in production
-2. **Verify CORS configuration**
-3. **Test real-time data updates**
-4. **Validate transaction system**
-5. **Check dark/light mode toggle**
+### Testing & Verification ✅
+- ✅ Backend health check: http://150.136.38.166:8000/health
+- ✅ GraphQL playground: http://150.136.38.166:8000/graphql  
+- ✅ CORS properly configured for Vercel domain
+- ✅ PostgreSQL database with persistent storage
+- ✅ Frontend successfully connecting to OCI backend
 
 ## 🔧 Key Implementation Details
 
