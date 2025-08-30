@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/header';
 import { PortfolioOverview } from '@/components/portfolio/portfolio-overview';
+import { AIAssistantPopup } from '@/components/chatbot/ai-assistant-popup';
 
 export default function PortfolioPage() {
   return (
@@ -18,6 +19,9 @@ export default function PortfolioPage() {
 
         <PortfolioOverview />
       </main>
+
+      {/* AI Assistant Popup */}
+      <AIAssistantPopup />
     </div>
   );
 }

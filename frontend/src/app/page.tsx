@@ -2,6 +2,7 @@ import { Header } from '@/components/layout/header';
 import { CryptoList } from '@/components/crypto/crypto-list';
 import { PortfolioOverview } from '@/components/portfolio/portfolio-overview';
 import { PriceChart } from '@/components/charts/price-chart';
+import { AIAssistantPopup } from '@/components/chatbot/ai-assistant-popup';
 
 export default function Home() {
   return (
@@ -55,6 +56,9 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {/* AI Assistant Popup */}
+      <AIAssistantPopup />
     </div>
   );
 }

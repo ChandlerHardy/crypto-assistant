@@ -21,9 +21,10 @@ interface Message {
 
 interface ChatInterfaceProps {
   className?: string;
+  showHeader?: boolean;
 }
 
-export function ChatInterface({ className = '' }: ChatInterfaceProps) {
+export function ChatInterface({ className = '', showHeader = true }: ChatInterfaceProps) {
   const [isClient, setIsClient] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -138,17 +139,19 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
   };
 
   return (
-    <div className={`flex flex-col h-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg ${className}`}>
+    <div className={`flex flex-col h-full bg-transparent border-0 rounded-lg ${className}`}>
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
-        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-          <Bot className="w-5 h-5 text-white" />
+      {showHeader && (
+        <div className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-white">CryptoAssist AI</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Your crypto portfolio advisor</p>
+          </div>
         </div>
-        <div>
-          <h3 className="font-semibold text-gray-900 dark:text-white">CryptoAssist AI</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Your crypto portfolio advisor</p>
-        </div>
-      </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
@@ -207,7 +210,7 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
+      <div className="p-4 border-t border-white/10 dark:border-gray-600/20 bg-transparent rounded-b-lg">
         <div className="flex gap-3">
           <input
             ref={inputRef}
@@ -216,19 +219,28 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask me about your crypto portfolio or market insights..."
-            className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg 
-                     bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                     placeholder-gray-500 dark:placeholder-gray-400
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                     disabled:opacity-50"
+            className="flex-1 px-4 py-3 border border-white/20 dark:border-gray-600/30 rounded-lg 
+                     bg-white/10 dark:bg-gray-700/20 text-gray-900 dark:text-white
+                     placeholder-gray-600 dark:placeholder-gray-300
+                     focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-white/30
+                     disabled:opacity-50 backdrop-blur-sm"
+            style={{
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+            }}
             disabled={isLoading}
           />
           <button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isLoading}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 
+            className="px-6 py-3 bg-blue-500/80 text-white rounded-lg hover:bg-blue-600/80 
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors duration-200 flex items-center gap-2"
+                     transition-colors duration-200 flex items-center gap-2 backdrop-blur-sm
+                     border border-white/20"
+            style={{
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+            }}
           >
             <Send className="w-4 h-4" />
             Send
