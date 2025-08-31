@@ -22,9 +22,10 @@ interface Message {
 interface ChatInterfaceProps {
   className?: string;
   showHeader?: boolean;
+  portfolioData?: any;
 }
 
-export function ChatInterface({ className = '', showHeader = true }: ChatInterfaceProps) {
+export function ChatInterface({ className = '', showHeader = true, portfolioData }: ChatInterfaceProps) {
   const [isClient, setIsClient] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -68,10 +69,30 @@ export function ChatInterface({ className = '', showHeader = true }: ChatInterfa
     setIsLoading(true);
 
     try {
+      const portfolioContext = portfolioData ? JSON.stringify({
+        portfolios: portfolioData.map((portfolio: any) => ({
+          name: portfolio.name,
+          totalValue: portfolio.totalValue,
+          totalProfitLoss: portfolio.totalProfitLoss,
+          totalProfitLossPercentage: portfolio.totalProfitLossPercentage,
+          assets: portfolio.assets.map((asset: any) => ({
+            symbol: asset.symbol,
+            name: asset.name,
+            amount: asset.amount,
+            currentPrice: asset.currentPrice,
+            totalValue: asset.totalValue,
+            profitLoss: asset.profitLoss,
+            profitLossPercentage: asset.profitLossPercentage,
+            averageBuyPrice: asset.averageBuyPrice
+          }))
+        })),
+        summary: `User has ${portfolioData.length} portfolio(s). Total combined value: $${portfolioData.reduce((sum: number, p: any) => sum + (p.totalValue || 0), 0).toLocaleString()}. Contains ${portfolioData.reduce((sum: number, p: any) => sum + (p.assets?.length || 0), 0)} total assets.`
+      }) : null;
+
       const { data } = await chatWithAssistant({
         variables: {
           message: userMessage.content,
-          context: null
+          context: portfolioContext
         }
       });
 

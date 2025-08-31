@@ -10,6 +10,7 @@ services:
     environment:
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
       - COINGECKO_API_KEY=${COINGECKO_API_KEY:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]

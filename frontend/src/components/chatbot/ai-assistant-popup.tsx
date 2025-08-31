@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
 import { Bot, Minus, X } from 'lucide-react';
 import { ChatInterface } from './chat-interface';
 
@@ -11,6 +13,12 @@ interface AIAssistantPopupProps {
 export function AIAssistantPopup({ className = '' }: AIAssistantPopupProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  
+  // Fetch portfolio data for AI context
+  const { data: portfoliosData } = useQuery(GET_PORTFOLIOS, {
+    skip: !isOpen, // Only fetch when chat is open
+    pollInterval: 300000, // Poll every 5 minutes when open
+  });
 
   const toggleChat = () => {
     if (isOpen && !isMinimized) {
@@ -88,7 +96,11 @@ export function AIAssistantPopup({ className = '' }: AIAssistantPopupProps) {
             {!isMinimized && (
               <>
                 <div className="flex-1 min-h-0">
-                  <ChatInterface className="h-full border-0 rounded-none" showHeader={false} />
+                  <ChatInterface 
+                    className="h-full border-0 rounded-none" 
+                    showHeader={false} 
+                    portfolioData={portfoliosData?.portfolios}
+                  />
                 </div>
                 
                 {/* Footer */}

@@ -4,10 +4,17 @@ This guide will help you deploy your Crypto Assistant application to Oracle Clou
 
 ## Prerequisites
 
-1. **OCI Instance**: A running VM.Standard.A1.Flex instance
+1. **OCI Instance**: A running VM.Standard.A1.Flex instance (IP: 150.136.38.166)
 2. **SSH Access**: SSH key configured for your instance
 3. **Security Groups**: Ports 22, 80, 443, 3000, 8000 open (see `setup-oci-security-groups.md`)
 4. **Docker**: Will be installed automatically by the deployment script
+
+## SSH Access
+
+To SSH into the OCI instance:
+```bash
+ssh ubuntu@150.136.38.166 -i /Users/chandlerhardy/.ssh/ampere.key
+```
 
 ## Quick Deployment
 
