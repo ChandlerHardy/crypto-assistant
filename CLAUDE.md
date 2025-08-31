@@ -58,14 +58,22 @@ curl -X POST "https://backend.chandlerhardy.com/cryptassist/graphql" \
 - **Features**: Portfolio-aware advice, real-time market analysis
 - **UI**: Glassmorphism floating chat widget
 
-## 📁 Project Structure
+## 📁 Key File Locations
 ```
 crypto-assistant/
-├── frontend/           # Next.js app (deployed to Vercel)
-├── backend/           # FastAPI app (deployed to OCI)
-├── deploy/            # Deployment scripts
-├── DEPLOYMENT_STATUS.md  # Detailed deployment info
-└── CLAUDE.md          # This file
+├── frontend/
+│   ├── src/components/chatbot/    # AI chat components
+│   ├── src/lib/graphql/          # GraphQL queries/mutations
+│   ├── src/types/crypto.ts       # TypeScript interfaces
+│   └── src/lib/apollo-client.ts  # GraphQL client setup
+├── backend/
+│   ├── app/schemas/mutations.py  # GraphQL mutations (AI chat here)
+│   ├── app/services/ai_service.py # GitHub Llama integration
+│   ├── app/core/config.py        # Environment config
+│   └── docker-compose.backend.yml # Production container config
+├── deploy/
+│   └── deploy-backend-to-oci.sh  # Main deployment script
+└── CLAUDE.md                     # This file
 ```
 
 ## 🚨 Quick Fixes
@@ -80,6 +88,38 @@ crypto-assistant/
 - ✅ Portfolio data integration with AI responses
 - ✅ GitHub Llama AI model integration
 - ✅ Production deployment with SSL/HTTPS
+
+## 🔄 Development Workflow
+1. **Make changes** locally in frontend/ or backend/
+2. **Test locally**: `npm run dev` (frontend) or `uvicorn app.main:app --reload` (backend)
+3. **Build test**: `npm run build` to check for TypeScript errors
+4. **Commit & push** to main branch
+5. **Frontend auto-deploys** via Vercel
+6. **Backend deploy**: Run `./deploy/deploy-backend-to-oci.sh 150.136.38.166`
+
+## 📊 Database Schema (Key Models)
+- **Portfolio**: id, name, totalValue, totalProfitLoss, assets[]
+- **PortfolioAsset**: id, symbol, amount, currentPrice, profitLoss, transactions[]
+- **AssetTransaction**: id, type (buy/sell), amount, pricePerUnit, timestamp
+
+## 🔍 GraphQL Schema (Key Endpoints)
+```graphql
+# Queries
+query GetPortfolios { portfolios { ... } }
+query GetCryptocurrencies { cryptocurrencies { ... } }
+
+# Mutations
+mutation ChatWithAssistant($message: String!, $context: String)
+mutation CreatePortfolio($input: CreatePortfolioInput)
+mutation AddAssetToPortfolio($input: AddAssetInput)
+```
+
+## ⚠️ Known Issues & Considerations
+- **GraphQL endpoint**: Must use `/cryptassist/graphql` (not `/graphql`)
+- **TypeScript strict**: All `any` types cause build failures
+- **ARM64 architecture**: OCI server uses ARM, not x86
+- **Environment variables**: Docker needs explicit env var passing
+- **CORS configuration**: Frontend domain must be in backend CORS_ORIGINS
 
 ## 💡 Important Notes
 - Backend runs on OCI Always Free tier (ARM64)
