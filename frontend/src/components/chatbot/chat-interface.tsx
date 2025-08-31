@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { Send, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { Portfolio } from '@/types/crypto';
 
 const CHAT_WITH_ASSISTANT = gql`
   mutation ChatWithAssistant($message: String!, $context: String) {
@@ -22,7 +23,7 @@ interface Message {
 interface ChatInterfaceProps {
   className?: string;
   showHeader?: boolean;
-  portfolioData?: any;
+  portfolioData?: Portfolio[];
 }
 
 export function ChatInterface({ className = '', showHeader = true, portfolioData }: ChatInterfaceProps) {
@@ -70,12 +71,12 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
 
     try {
       const portfolioContext = portfolioData ? JSON.stringify({
-        portfolios: portfolioData.map((portfolio: any) => ({
+        portfolios: portfolioData.map((portfolio) => ({
           name: portfolio.name,
           totalValue: portfolio.totalValue,
           totalProfitLoss: portfolio.totalProfitLoss,
           totalProfitLossPercentage: portfolio.totalProfitLossPercentage,
-          assets: portfolio.assets.map((asset: any) => ({
+          assets: portfolio.assets.map((asset) => ({
             symbol: asset.symbol,
             name: asset.name,
             amount: asset.amount,
@@ -86,7 +87,7 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
             averageBuyPrice: asset.averageBuyPrice
           }))
         })),
-        summary: `User has ${portfolioData.length} portfolio(s). Total combined value: $${portfolioData.reduce((sum: number, p: any) => sum + (p.totalValue || 0), 0).toLocaleString()}. Contains ${portfolioData.reduce((sum: number, p: any) => sum + (p.assets?.length || 0), 0)} total assets.`
+        summary: `User has ${portfolioData.length} portfolio(s). Total combined value: $${portfolioData.reduce((sum, p) => sum + (p.totalValue || 0), 0).toLocaleString()}. Contains ${portfolioData.reduce((sum, p) => sum + (p.assets?.length || 0), 0)} total assets.`
       }) : null;
 
       const { data } = await chatWithAssistant({
