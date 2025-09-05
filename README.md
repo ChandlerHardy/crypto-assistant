@@ -7,6 +7,9 @@ A real-time cryptocurrency portfolio tracking and analysis application built wit
 - 🚀 **Real-time Updates**: Live cryptocurrency price tracking via WebSocket connections
 - 📊 **Data Visualization**: Interactive charts using Plotly.js and Recharts
 - 💼 **Portfolio Management**: Track multiple portfolios with detailed analytics
+- 📈 **Advanced Selling**: Smart validation, auto-modal closure, and FIFO P&L calculation
+- 📋 **Transaction History**: Complete ledger preserving all buy/sell transactions
+- 💰 **Realized P&L Tracking**: Accurate cost basis and return percentage calculations
 - 🤖 **AI Assistant**: Real-time crypto advice powered by GitHub's Llama AI model
 - 🔍 **Risk Analysis**: Portfolio optimization algorithms and risk assessment
 - ⚡ **GraphQL API**: Efficient data fetching with Apollo Client caching
@@ -211,17 +214,43 @@ query GetCryptocurrencies {
 }
 
 # Get portfolio data
-query GetPortfolio($id: String!) {
-  portfolio(id: $id) {
+query GetPortfolios {
+  portfolios {
     id
     name
-    total_value
+    totalValue
+    totalProfitLoss
+    totalRealizedProfitLoss
+    totalCostBasis
     assets {
       symbol
       amount
-      current_price
-      total_value
+      currentPrice
+      totalValue
+      profitLoss
+      transactions {
+        transactionType
+        amount
+        pricePerUnit
+        realizedProfitLoss
+        timestamp
+      }
     }
+  }
+}
+
+# Get portfolio transaction history
+query GetPortfolioTransactions($portfolioId: String!) {
+  portfolioTransactions(portfolioId: $portfolioId) {
+    id
+    transactionType
+    amount
+    pricePerUnit
+    totalValue
+    realizedProfitLoss
+    timestamp
+    symbol
+    name
   }
 }
 ```

@@ -88,6 +88,10 @@ crypto-assistant/
 - ✅ Portfolio data integration with AI responses
 - ✅ GitHub Llama AI model integration
 - ✅ Production deployment with SSL/HTTPS
+- ✅ Enhanced portfolio selling functionality with smart validation
+- ✅ Comprehensive transaction ledger with historical preservation
+- ✅ Realized P&L tracking with FIFO cost basis calculation
+- ✅ Auto-modal closure and user feedback improvements
 
 ## 🔄 Development Workflow
 1. **Make changes** locally in frontend/ or backend/
@@ -97,21 +101,31 @@ crypto-assistant/
 5. **Frontend auto-deploys** via Vercel
 6. **Backend deploy**: Run `./deploy/deploy-backend-to-oci.sh 150.136.38.166`
 
+## 📊 Portfolio Features
+- **Smart Selling**: Auto-validation caps sell amounts at available holdings
+- **Transaction History**: Complete ledger preserving all transactions (even from sold assets)
+- **Realized P&L Tracking**: FIFO cost basis calculation for accurate gain/loss reporting
+- **P&L Percentage**: Includes both unrealized gains and realized profits in total return calculation
+- **Modal UX**: Auto-close on asset sellout with user feedback notifications
+- **Historical Preservation**: Maintains transaction records after assets are fully sold
+
 ## 📊 Database Schema (Key Models)
-- **Portfolio**: id, name, totalValue, totalProfitLoss, assets[]
+- **Portfolio**: id, name, totalValue, totalProfitLoss, totalRealizedProfitLoss, totalCostBasis, assets[]
 - **PortfolioAsset**: id, symbol, amount, currentPrice, profitLoss, transactions[]
-- **AssetTransaction**: id, type (buy/sell), amount, pricePerUnit, timestamp
+- **AssetTransaction**: id, type (buy/sell), amount, pricePerUnit, realizedProfitLoss, timestamp, portfolioId
 
 ## 🔍 GraphQL Schema (Key Endpoints)
 ```graphql
 # Queries
 query GetPortfolios { portfolios { ... } }
+query GetPortfolioTransactions($portfolioId: String!) { ... }
 query GetCryptocurrencies { cryptocurrencies { ... } }
 
 # Mutations
 mutation ChatWithAssistant($message: String!, $context: String)
 mutation CreatePortfolio($input: CreatePortfolioInput)
 mutation AddAssetToPortfolio($input: AddAssetInput)
+mutation AddTransaction($input: AddTransactionInput)
 ```
 
 ## ⚠️ Known Issues & Considerations
