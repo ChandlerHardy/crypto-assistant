@@ -86,12 +86,12 @@ export function PortfolioPerformanceChart({ portfolio }: PortfolioPerformanceCha
   const isPositive = portfolio.totalProfitLoss >= 0;
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div className="p-4 pb-0">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="p-3 pb-1">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
           Portfolio Performance
         </h3>
-        <div className="flex items-center space-x-4 text-sm">
+        <div className="flex items-center space-x-4 text-xs">
           <span className="text-gray-500 dark:text-gray-400">
             Current: ${portfolio.totalValue.toLocaleString()}
           </span>
@@ -102,9 +102,9 @@ export function PortfolioPerformanceChart({ portfolio }: PortfolioPerformanceCha
         </div>
       </div>
       
-      <div className="h-64 p-4">
+      <div className="h-48 px-3 pb-0">
         <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <LineChart data={chartData} margin={{ top: 2, right: 10, left: 10, bottom: 2 }}>
           <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
           <XAxis 
             dataKey="date"

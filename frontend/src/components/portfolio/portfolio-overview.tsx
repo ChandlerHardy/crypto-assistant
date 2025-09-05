@@ -9,6 +9,8 @@ import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
 import { AssetDetailModal } from '@/components/portfolio/asset-detail-modal';
 import { PortfolioTransactionsModal } from '@/components/portfolio/portfolio-transactions-modal';
 import { PortfolioPerformanceChart } from '@/components/portfolio/portfolio-performance-chart';
+import { CustomizableDashboard } from '@/components/dashboard/customizable-dashboard';
+import { CryptoList } from '@/components/crypto/crypto-list';
 import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2, History } from 'lucide-react';
 import { Portfolio, PortfolioAsset } from '@/types/crypto';
 
@@ -239,10 +241,9 @@ export function PortfolioOverview() {
     ? portfolios[0].totalProfitLossPercentage 
     : totalCostBasis > 0 ? (totalProfitLoss / totalCostBasis) * 100 : 0;
 
-  return (
-    <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  // Extract sections as separate components
+  const summaryCardsSection = (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -312,15 +313,25 @@ export function PortfolioOverview() {
             </div>
           </CardContent>
         </Card>
-      </div>
+    </div>
+  );
 
-      {/* Performance Chart - Show for first portfolio if exists */}
-      {portfolios.length > 0 && portfolios[0].assets.length > 0 && (
-        <PortfolioPerformanceChart portfolio={portfolios[0]} />
-      )}
+  const performanceChartSection = portfolios.length > 0 && portfolios[0].assets.length > 0 ? (
+    <PortfolioPerformanceChart portfolio={portfolios[0]} />
+  ) : (
+    <Card>
+      <CardContent className="p-8 text-center">
+        <p className="text-gray-500 dark:text-gray-400">Add assets to your portfolio to see performance chart</p>
+      </CardContent>
+    </Card>
+  );
 
-      {/* Portfolio List */}
-      <Card>
+  const topCryptosSection = (
+    <CryptoList limit={10} />
+  );
+
+  const portfolioListSection = (
+    <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Your Portfolios</span>
@@ -437,6 +448,16 @@ export function PortfolioOverview() {
           </div>
         </CardContent>
       </Card>
+  );
+
+  return (
+    <>
+      <CustomizableDashboard
+        summaryCards={summaryCardsSection}
+        performanceChart={performanceChartSection}
+        portfolioList={portfolioListSection}
+        topCryptos={topCryptosSection}
+      />
 
       {/* Create Portfolio Modal for when portfolios exist */}
       {isCreateModalOpen && (
@@ -605,6 +626,6 @@ export function PortfolioOverview() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

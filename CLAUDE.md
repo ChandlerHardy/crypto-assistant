@@ -89,6 +89,12 @@ crypto-assistant/
 - ✅ Portfolio data integration with AI responses
 - ✅ GitHub Llama AI model integration
 - ✅ Production deployment with SSL/HTTPS
+- ✅ **Customizable Dashboard System** (Latest)
+  - Drag-and-drop reordering of dashboard sections
+  - Fixed crypto sidebar with main content reordering
+  - Glassmorphism effects on all controls
+  - localStorage persistence for user preferences
+  - Optimized chart heights and layout spacing
 - ✅ Enhanced portfolio selling functionality with smart validation
 - ✅ Comprehensive transaction ledger with historical preservation
 - ✅ Realized P&L tracking with FIFO cost basis calculation
@@ -126,6 +132,34 @@ crypto-assistant/
 - 🔄 **TradingView Integration**: Professional-grade candlestick and technical analysis charts
 - 🔄 **Comparative Analysis**: Portfolio vs market benchmarks (BTC, ETH, S&P 500)
 - 🔄 **Performance Analytics**: Sharpe ratio, max drawdown, volatility metrics
+
+## 🎛️ Customizable Dashboard (Next Priority)
+**Goal**: Allow users to drag-and-drop reorder dashboard sections and customize layout
+
+**Implementation Plan:**
+1. **Add @dnd-kit/core** - Modern, accessible drag & drop library
+2. **Create DashboardSection interface** - id, component, title, enabled, order
+3. **Dashboard sections to make draggable:**
+   - 📊 Summary Cards (Total Value, P&L, P&L %)
+   - 📈 Portfolio Performance Chart  
+   - 💼 Portfolio List (Your Portfolios)
+   - 🪙 Top Cryptocurrencies (if added)
+   - 🤖 AI Chat Widget (repositionable)
+
+**Features to implement:**
+- ✅ **Drag & Drop Reordering** - Move sections up/down with visual feedback
+- ✅ **Toggle Sections On/Off** - Hide/show sections with eye icon
+- ✅ **Save Layout** - Persist preferences in localStorage
+- ✅ **Reset to Default** - Restore original layout
+- 🔄 **Size Options** - Full width, half width, quarter width for sections
+- 🔄 **Layout Presets** - "Trading Focus", "Portfolio Focus", "Overview" templates
+- 🔄 **Customization Modal** - Settings panel for layout configuration
+
+**Technical Details:**
+- Use @dnd-kit/core for accessibility and modern React support
+- Store layout in localStorage as DashboardSection[]
+- Create DashboardCustomizer component with drag handles
+- Implement visual feedback during drag operations
 
 ## 📊 Database Schema (Key Models)
 - **Portfolio**: id, name, totalValue, totalProfitLoss, totalRealizedProfitLoss, totalCostBasis, assets[]
