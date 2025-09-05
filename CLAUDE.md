@@ -5,6 +5,7 @@ Crypto Portfolio Analyzer - A real-time cryptocurrency portfolio tracking and an
 
 ## Tech Stack
 - **Frontend**: Next.js 15 + TypeScript, Tailwind CSS, Apollo GraphQL
+- **Charting**: Recharts (current), Chart.js, TradingView widgets (roadmap)
 - **Backend**: FastAPI + Strawberry GraphQL, PostgreSQL
 - **AI**: GitHub Llama 3.1 8B model integration
 - **Deployment**: Vercel (frontend) + Oracle Cloud Infrastructure (backend)
@@ -106,8 +107,25 @@ crypto-assistant/
 - **Transaction History**: Complete ledger preserving all transactions (even from sold assets)
 - **Realized P&L Tracking**: FIFO cost basis calculation for accurate gain/loss reporting
 - **P&L Percentage**: Includes both unrealized gains and realized profits in total return calculation
+- **Performance Charts**: Recharts-based portfolio value timeline (basic implementation)
 - **Modal UX**: Auto-close on asset sellout with user feedback notifications
 - **Historical Preservation**: Maintains transaction records after assets are fully sold
+
+## 📈 Charting & Analytics Roadmap
+**Current (v1.0 - Basic Charts):**
+- ✅ **Recharts Integration**: Simple line charts showing portfolio performance over time
+- ✅ **Basic Timeline**: Transaction-based portfolio value reconstruction
+- ✅ **Visual P&L**: Green/red coloring based on portfolio performance
+
+**Future Enhancements (v2.0 - Advanced Charting):**
+- 🔄 **Time Range Filters**: 1D, 1W, 1M, 3M, 1Y, ALL buttons (like Robinhood)
+- 🔄 **Portfolio Snapshots**: Real-time database snapshots for accurate historical data  
+- 🔄 **Transaction Date Input**: Allow users to backdate transactions for historical accuracy
+- 🔄 **Advanced Charts**: Chart.js integration with zoom, pan, and crosshairs
+- 🔄 **Multiple Metrics**: Volume, individual asset performance, correlation analysis
+- 🔄 **TradingView Integration**: Professional-grade candlestick and technical analysis charts
+- 🔄 **Comparative Analysis**: Portfolio vs market benchmarks (BTC, ETH, S&P 500)
+- 🔄 **Performance Analytics**: Sharpe ratio, max drawdown, volatility metrics
 
 ## 📊 Database Schema (Key Models)
 - **Portfolio**: id, name, totalValue, totalProfitLoss, totalRealizedProfitLoss, totalCostBasis, assets[]

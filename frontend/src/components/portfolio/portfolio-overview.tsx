@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
 import { AssetDetailModal } from '@/components/portfolio/asset-detail-modal';
 import { PortfolioTransactionsModal } from '@/components/portfolio/portfolio-transactions-modal';
+import { PortfolioPerformanceChart } from '@/components/portfolio/portfolio-performance-chart';
 import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2, History } from 'lucide-react';
 import { Portfolio, PortfolioAsset } from '@/types/crypto';
 
@@ -276,7 +277,8 @@ export function PortfolioOverview() {
                     {totalRealizedPL !== 0 && totalUnrealizedPL !== 0 && <span> • </span>}
                     {totalUnrealizedPL !== 0 && (
                       <span className={totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}>
-                        Unrealized: ${totalUnrealizedPL.toLocaleString()}
+                        Unrealized: ${totalUnrealizedPL.toLocaleString()} ({totalValue > 0 ? 
+                          ((totalUnrealizedPL / (totalValue - totalUnrealizedPL)) * 100).toFixed(2) : '0.00'}%)
                       </span>
                     )}
                   </div>
@@ -311,6 +313,11 @@ export function PortfolioOverview() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Performance Chart - Show for first portfolio if exists */}
+      {portfolios.length > 0 && portfolios[0].assets.length > 0 && (
+        <PortfolioPerformanceChart portfolio={portfolios[0]} />
+      )}
 
       {/* Portfolio List */}
       <Card>
@@ -395,7 +402,7 @@ export function PortfolioOverview() {
                         <div className="flex items-center space-x-3">
                           <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-white">{asset.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{asset.amount} {asset.symbol.toUpperCase()}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{parseFloat(asset.amount.toFixed(8))} {asset.symbol.toUpperCase()}</p>
                           </div>
                         </div>
                         <div className="text-right">
