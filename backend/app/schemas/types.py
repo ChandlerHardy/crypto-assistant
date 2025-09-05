@@ -36,8 +36,13 @@ class AssetTransaction:
     amount: float
     price_per_unit: float = strawberry.field(name="pricePerUnit")
     total_value: float = strawberry.field(name="totalValue")
+    realized_profit_loss: float = strawberry.field(name="realizedProfitLoss", default=0.0)
     timestamp: datetime
     notes: Optional[str] = None
+    # Additional fields for portfolio transaction history
+    crypto_id: Optional[str] = strawberry.field(name="cryptoId", default=None)
+    symbol: Optional[str] = None
+    name: Optional[str] = None
 
 @strawberry.type
 class PortfolioAsset:
@@ -61,6 +66,8 @@ class Portfolio:
     total_value: float = strawberry.field(name="totalValue")
     total_profit_loss: float = strawberry.field(name="totalProfitLoss")
     total_profit_loss_percentage: float = strawberry.field(name="totalProfitLossPercentage")
+    total_realized_profit_loss: float = strawberry.field(name="totalRealizedProfitLoss", default=0.0)
+    total_cost_basis: float = strawberry.field(name="totalCostBasis", default=0.0)
     assets: List[PortfolioAsset]
     created_at: datetime = strawberry.field(name="createdAt")
     updated_at: datetime = strawberry.field(name="updatedAt")

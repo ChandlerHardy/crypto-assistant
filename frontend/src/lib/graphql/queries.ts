@@ -50,6 +50,8 @@ export const GET_PORTFOLIOS = gql`
       totalValue
       totalProfitLoss
       totalProfitLossPercentage
+      totalRealizedProfitLoss
+      totalCostBasis
       createdAt
       updatedAt
       assets {
@@ -69,6 +71,7 @@ export const GET_PORTFOLIOS = gql`
           amount
           pricePerUnit
           totalValue
+          realizedProfitLoss
           timestamp
           notes
         }
@@ -82,6 +85,24 @@ export const GET_PRICE_HISTORY = gql`
     priceHistory(cryptoId: $cryptoId, days: $days) {
       timestamp
       price
+    }
+  }
+`;
+
+export const GET_PORTFOLIO_TRANSACTIONS = gql`
+  query GetPortfolioTransactions($portfolioId: String!) {
+    portfolioTransactions(portfolioId: $portfolioId) {
+      id
+      transactionType
+      amount
+      pricePerUnit
+      totalValue
+      realizedProfitLoss
+      timestamp
+      notes
+      cryptoId
+      symbol
+      name
     }
   }
 `;

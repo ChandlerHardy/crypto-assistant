@@ -31,8 +31,13 @@ export interface AssetTransaction {
   amount: number;
   pricePerUnit: number;
   totalValue: number;
+  realizedProfitLoss: number;
   timestamp: string;
   notes?: string;
+  // These fields are only present in portfolio transaction history
+  cryptoId?: string;
+  symbol?: string;
+  name?: string;
 }
 
 export interface PortfolioAsset {
@@ -56,6 +61,8 @@ export interface Portfolio {
   totalValue: number;
   totalProfitLoss: number;
   totalProfitLossPercentage: number;
+  totalRealizedProfitLoss: number;
+  totalCostBasis: number;
   assets: PortfolioAsset[];
   createdAt: string;
   updatedAt: string;

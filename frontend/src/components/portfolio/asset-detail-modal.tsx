@@ -53,18 +53,61 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
       return;
     }
 
+    const sellAmount = parseFloat(amount);
+    
+    // Validate sell amount doesn't exceed holdings
+    if (transactionType === 'sell' && sellAmount > currentAsset.amount) {
+      // Cap the sell amount to what they actually have
+      const cappedAmount = currentAsset.amount;
+      setAmount(cappedAmount.toString());
+      
+      const confirmMessage = `You only have ${currentAsset.amount} ${currentAsset.symbol.toUpperCase()}. ` +
+        `The amount has been adjusted to sell your entire holding (${cappedAmount} ${currentAsset.symbol.toUpperCase()}). Continue?`;
+      
+      if (!confirm(confirmMessage)) {
+        return;
+      }
+      
+      // Use the capped amount for the transaction
+      await addTransaction({
+        variables: {
+          input: {
+            portfolioId: portfolioId,
+            assetId: currentAsset.id,
+            transactionType: transactionType,
+            amount: cappedAmount,
+            pricePerUnit: parseFloat(pricePerUnit),
+            notes: notes.trim() || `Full sellout of ${cappedAmount} ${currentAsset.symbol.toUpperCase()}`,
+          },
+        },
+      });
+      
+      // Show sellout notification
+      alert(`Successfully sold all ${cappedAmount} ${currentAsset.symbol.toUpperCase()}! The asset has been removed from your portfolio.`);
+      
+      // Close modal since asset will be deleted
+      onClose();
+      return;
+    }
+
     await addTransaction({
       variables: {
         input: {
           portfolioId: portfolioId,
           assetId: currentAsset.id,
           transactionType: transactionType,
-          amount: parseFloat(amount),
+          amount: sellAmount,
           pricePerUnit: parseFloat(pricePerUnit),
           notes: notes.trim() || null,
         },
       },
     });
+    
+    // Check if this was a full sellout
+    if (transactionType === 'sell' && sellAmount >= currentAsset.amount) {
+      alert(`Successfully sold all ${sellAmount} ${currentAsset.symbol.toUpperCase()}! The asset has been removed from your portfolio.`);
+      onClose();
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -221,6 +264,13 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Total: ${transaction.totalValue.toLocaleString()}
                       </p>
+                      {transaction.transactionType === 'sell' && transaction.realizedProfitLoss !== 0 && (
+                        <p className={`text-xs font-medium ${
+                          transaction.realizedProfitLoss >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          Realized: {transaction.realizedProfitLoss >= 0 ? '+' : ''}${transaction.realizedProfitLoss.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))
@@ -275,6 +325,20 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                   required
                 />
+                {transactionType === 'sell' && (
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Available: {currentAsset.amount} {currentAsset.symbol.toUpperCase()}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setAmount(currentAsset.amount.toString())}
+                      className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      Sell All
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Price Per Unit */}

@@ -96,9 +96,10 @@ class Query:
             portfolios = []
             
             for portfolio_model in portfolio_models:
-                # Convert assets to GraphQL types
+                # Convert only active assets (amount > 0) to GraphQL types for main display
+                active_assets = db_service.get_active_portfolio_assets(portfolio_model.id)
                 assets = []
-                for asset_model in portfolio_model.assets:
+                for asset_model in active_assets:
                     # Get transactions for this asset
                     transaction_models = db_service.get_asset_transactions(asset_model.id)
                     transactions = [
@@ -108,6 +109,7 @@ class Query:
                             amount=t.amount,
                             price_per_unit=t.price_per_unit,
                             total_value=t.total_value,
+                            realized_profit_loss=t.realized_profit_loss,
                             timestamp=t.timestamp,
                             notes=t.notes
                         ) for t in transaction_models
@@ -135,6 +137,8 @@ class Query:
                     total_value=portfolio_model.total_value,
                     total_profit_loss=portfolio_model.total_profit_loss,
                     total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
+                    total_realized_profit_loss=portfolio_model.total_realized_profit_loss,
+                    total_cost_basis=portfolio_model.total_cost_basis,
                     assets=assets,
                     created_at=portfolio_model.created_at,
                     updated_at=portfolio_model.updated_at
@@ -151,9 +155,10 @@ class Query:
             if not portfolio_model:
                 return None
             
-            # Convert assets to GraphQL types
+            # Convert only active assets (amount > 0) to GraphQL types for main display
+            active_assets = db_service.get_active_portfolio_assets(portfolio_model.id)
             assets = []
-            for asset_model in portfolio_model.assets:
+            for asset_model in active_assets:
                 # Get transactions for this asset
                 transaction_models = db_service.get_asset_transactions(asset_model.id)
                 transactions = [
@@ -163,6 +168,7 @@ class Query:
                         amount=t.amount,
                         price_per_unit=t.price_per_unit,
                         total_value=t.total_value,
+                        realized_profit_loss=t.realized_profit_loss,
                         timestamp=t.timestamp,
                         notes=t.notes
                     ) for t in transaction_models
@@ -190,6 +196,7 @@ class Query:
                 total_value=portfolio_model.total_value,
                 total_profit_loss=portfolio_model.total_profit_loss,
                 total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
+                total_realized_profit_loss=portfolio_model.total_realized_profit_loss,
                 assets=assets,
                 created_at=portfolio_model.created_at,
                 updated_at=portfolio_model.updated_at
@@ -211,3 +218,31 @@ class Query:
         except Exception as e:
             print(f"Error fetching price history for {crypto_id}: {e}")
             return []
+    
+    @strawberry.field
+    async def portfolio_transactions(
+        self, 
+        portfolio_id: str = strawberry.argument(name="portfolioId")
+    ) -> List[AssetTransaction]:
+        """Get all transactions for a portfolio (including historical transactions)"""
+        with DatabaseService() as db_service:
+            transaction_models = db_service.get_portfolio_transactions(portfolio_id)
+            
+            transactions = []
+            for t in transaction_models:
+                transaction = AssetTransaction(
+                    id=t.id,
+                    transaction_type=t.transaction_type,
+                    amount=t.amount,
+                    price_per_unit=t.price_per_unit,
+                    total_value=t.total_value,
+                    realized_profit_loss=t.realized_profit_loss,
+                    timestamp=t.timestamp,
+                    notes=t.notes,
+                    crypto_id=t.crypto_id,
+                    symbol=t.symbol,
+                    name=t.name
+                )
+                transactions.append(transaction)
+            
+            return transactions

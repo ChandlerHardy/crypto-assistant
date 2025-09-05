@@ -7,13 +7,15 @@ import { CREATE_PORTFOLIO, DELETE_PORTFOLIO } from '@/lib/graphql/mutations';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AddAssetModal } from '@/components/portfolio/add-asset-modal';
 import { AssetDetailModal } from '@/components/portfolio/asset-detail-modal';
-import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2 } from 'lucide-react';
+import { PortfolioTransactionsModal } from '@/components/portfolio/portfolio-transactions-modal';
+import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2, History } from 'lucide-react';
 import { Portfolio, PortfolioAsset } from '@/types/crypto';
 
 export function PortfolioOverview() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
   const [isAssetDetailModalOpen, setIsAssetDetailModalOpen] = useState(false);
+  const [isTransactionsModalOpen, setIsTransactionsModalOpen] = useState(false);
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [selectedAsset, setSelectedAsset] = useState<PortfolioAsset | null>(null);
   const [name, setName] = useState('');
@@ -226,8 +228,15 @@ export function PortfolioOverview() {
   }
 
   const totalValue = portfolios.reduce((sum, p) => sum + p.totalValue, 0);
-  const totalProfitLoss = portfolios.reduce((sum, p) => sum + p.totalProfitLoss, 0);
-  const totalProfitLossPercentage = totalValue > 0 ? (totalProfitLoss / (totalValue - totalProfitLoss)) * 100 : 0;
+  const totalUnrealizedPL = portfolios.reduce((sum, p) => sum + p.totalProfitLoss, 0);
+  const totalRealizedPL = portfolios.reduce((sum, p) => sum + (p.totalRealizedProfitLoss || 0), 0);
+  const totalProfitLoss = totalUnrealizedPL + totalRealizedPL;
+  const totalCostBasis = portfolios.reduce((sum, p) => sum + (p.totalCostBasis || 0), 0);
+  
+  // Use the backend-calculated percentage, but recalculate if we have multiple portfolios
+  const totalProfitLossPercentage = portfolios.length === 1 
+    ? portfolios[0].totalProfitLossPercentage 
+    : totalCostBasis > 0 ? (totalProfitLoss / totalCostBasis) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -257,6 +266,21 @@ export function PortfolioOverview() {
                 }`}>
                   ${totalProfitLoss.toLocaleString()}
                 </p>
+                {(totalRealizedPL !== 0 || totalUnrealizedPL !== 0) && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {totalRealizedPL !== 0 && (
+                      <span className={totalRealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        Realized: ${totalRealizedPL.toLocaleString()}
+                      </span>
+                    )}
+                    {totalRealizedPL !== 0 && totalUnrealizedPL !== 0 && <span> • </span>}
+                    {totalUnrealizedPL !== 0 && (
+                      <span className={totalUnrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        Unrealized: ${totalUnrealizedPL.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
               {totalProfitLoss >= 0 ? (
                 <TrendingUp className="w-8 h-8 text-green-600" />
@@ -320,13 +344,34 @@ export function PortfolioOverview() {
                         ${portfolio.totalValue.toLocaleString()}
                       </p>
                       <p className={`text-sm ${
-                        portfolio.totalProfitLossPercentage >= 0 
+                        (portfolio.totalProfitLoss + (portfolio.totalRealizedProfitLoss || 0)) >= 0 
                           ? 'text-green-600' 
                           : 'text-red-600'
                       }`}>
-                        {portfolio.totalProfitLossPercentage >= 0 ? '+' : ''}{portfolio.totalProfitLossPercentage.toFixed(2)}%
+                        {(portfolio.totalProfitLoss + (portfolio.totalRealizedProfitLoss || 0)) >= 0 ? '+' : ''}{
+                          portfolio.totalValue > 0 
+                            ? (((portfolio.totalProfitLoss + (portfolio.totalRealizedProfitLoss || 0)) / (portfolio.totalValue - portfolio.totalProfitLoss)) * 100).toFixed(2)
+                            : '0.00'
+                        }%
                       </p>
+                      {portfolio.totalRealizedProfitLoss !== 0 && (
+                        <p className={`text-xs ${
+                          portfolio.totalRealizedProfitLoss >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          Realized: {portfolio.totalRealizedProfitLoss >= 0 ? '+' : ''}${portfolio.totalRealizedProfitLoss.toLocaleString()}
+                        </p>
+                      )}
                     </div>
+                    <button
+                      onClick={() => {
+                        setSelectedPortfolio(portfolio);
+                        setIsTransactionsModalOpen(true);
+                      }}
+                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                      title="View transaction history"
+                    >
+                      <History className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => setDeleteConfirmPortfolio(portfolio)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
@@ -483,6 +528,19 @@ export function PortfolioOverview() {
             setSelectedPortfolio(null);
           }}
           asset={selectedAsset}
+          portfolioId={selectedPortfolio.id}
+          portfolioName={selectedPortfolio.name}
+        />
+      )}
+
+      {/* Portfolio Transactions Modal */}
+      {selectedPortfolio && (
+        <PortfolioTransactionsModal
+          isOpen={isTransactionsModalOpen}
+          onClose={() => {
+            setIsTransactionsModalOpen(false);
+            setSelectedPortfolio(null);
+          }}
           portfolioId={selectedPortfolio.id}
           portfolioName={selectedPortfolio.name}
         />

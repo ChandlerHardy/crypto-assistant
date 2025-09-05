@@ -100,6 +100,7 @@ class Mutation:
                 amount=transaction_model.amount,
                 price_per_unit=transaction_model.price_per_unit,
                 total_value=transaction_model.total_value,
+                realized_profit_loss=transaction_model.realized_profit_loss,
                 timestamp=transaction_model.timestamp,
                 notes=transaction_model.notes
             )
@@ -186,6 +187,7 @@ class Mutation:
                     amount=t.amount,
                     price_per_unit=t.price_per_unit,
                     total_value=t.total_value,
+                    realized_profit_loss=t.realized_profit_loss,
                     timestamp=t.timestamp,
                     notes=t.notes
                 ) for t in transactions
@@ -254,6 +256,7 @@ class Mutation:
                 amount=transaction_model.amount,
                 price_per_unit=transaction_model.price_per_unit,
                 total_value=transaction_model.total_value,
+                realized_profit_loss=transaction_model.realized_profit_loss,
                 timestamp=transaction_model.timestamp,
                 notes=transaction_model.notes
             )

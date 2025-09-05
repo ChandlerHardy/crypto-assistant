@@ -88,6 +88,7 @@ export const UPDATE_ASSET = gql`
         amount
         pricePerUnit
         totalValue
+        realizedProfitLoss
         timestamp
         notes
       }
@@ -103,6 +104,7 @@ export const ADD_TRANSACTION = gql`
       amount
       pricePerUnit
       totalValue
+      realizedProfitLoss
       timestamp
       notes
     }

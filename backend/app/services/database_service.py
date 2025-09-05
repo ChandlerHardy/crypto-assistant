@@ -57,18 +57,37 @@ class DatabaseService:
         if not portfolio:
             return
         
-        # Calculate totals from assets
-        total_value = sum(asset.total_value for asset in portfolio.assets)
-        total_profit_loss = sum(asset.profit_loss for asset in portfolio.assets)
+        # Calculate totals from only active assets (amount > 0)
+        active_assets = self.get_active_portfolio_assets(portfolio_id)
+        total_value = sum(asset.total_value for asset in active_assets)
+        total_profit_loss = sum(asset.profit_loss for asset in active_assets)
+        
+        # Get all transactions to calculate realized P&L and total cost basis
+        transactions = self.get_portfolio_transactions(portfolio_id)
+        total_realized_profit_loss = sum(t.realized_profit_loss for t in transactions if t.transaction_type == "sell")
+        
+        # Calculate total cost basis: sum of all buy transactions
+        buy_transactions = [t for t in transactions if t.transaction_type == "buy"]
+        total_cost_basis = sum(t.total_value for t in buy_transactions)
+        
+        # Calculate current holdings cost basis
+        current_holdings_cost_basis = sum(asset.amount * asset.average_buy_price for asset in active_assets)
+        
+        # Total P&L includes both unrealized and realized
+        total_combined_profit_loss = total_profit_loss + total_realized_profit_loss
+        
+        # Calculate percentage based on total cost basis
         total_profit_loss_percentage = (
-            (total_profit_loss / (total_value - total_profit_loss) * 100) 
-            if (total_value - total_profit_loss) > 0 else 0
+            (total_combined_profit_loss / total_cost_basis * 100) 
+            if total_cost_basis > 0 else 0
         )
         
         # Update portfolio
         portfolio.total_value = total_value
         portfolio.total_profit_loss = total_profit_loss
         portfolio.total_profit_loss_percentage = total_profit_loss_percentage
+        portfolio.total_realized_profit_loss = total_realized_profit_loss
+        portfolio.total_cost_basis = total_cost_basis
         portfolio.updated_at = datetime.utcnow()
         
         self.db.commit()
@@ -102,6 +121,17 @@ class DatabaseService:
     def get_asset(self, asset_id: str) -> Optional[PortfolioAssetModel]:
         """Get asset by ID"""
         return self.db.query(PortfolioAssetModel).filter(PortfolioAssetModel.id == asset_id).first()
+    
+    def get_portfolio_assets(self, portfolio_id: str) -> List[PortfolioAssetModel]:
+        """Get all assets for a portfolio"""
+        return self.db.query(PortfolioAssetModel).filter(PortfolioAssetModel.portfolio_id == portfolio_id).all()
+    
+    def get_active_portfolio_assets(self, portfolio_id: str) -> List[PortfolioAssetModel]:
+        """Get only active assets (amount > 0) for a portfolio"""
+        return self.db.query(PortfolioAssetModel).filter(
+            PortfolioAssetModel.portfolio_id == portfolio_id,
+            PortfolioAssetModel.amount > 0
+        ).all()
     
     def update_asset(self, asset_id: str, amount: float, average_buy_price: float, current_price: float) -> Optional[PortfolioAssetModel]:
         """Update an asset"""
@@ -138,13 +168,29 @@ class DatabaseService:
                           price_per_unit: float, notes: Optional[str] = None) -> AssetTransactionModel:
         """Create a new transaction"""
         total_value = amount * price_per_unit
+        realized_profit_loss = 0.0
+        
+        # Get asset info for historical reference
+        asset = self.get_asset(asset_id)
+        if not asset:
+            raise Exception(f"Asset {asset_id} not found")
+        
+        # Calculate realized P&L for sell transactions
+        if transaction_type == "sell":
+            # Use FIFO method: assume we sell the oldest purchases first
+            realized_profit_loss = amount * (price_per_unit - asset.average_buy_price)
         
         transaction = AssetTransactionModel(
             asset_id=asset_id,
+            portfolio_id=asset.portfolio_id,
+            crypto_id=asset.crypto_id,
+            symbol=asset.symbol,
+            name=asset.name,
             transaction_type=transaction_type,
             amount=amount,
             price_per_unit=price_per_unit,
             total_value=total_value,
+            realized_profit_loss=realized_profit_loss,
             notes=notes
         )
         
@@ -156,6 +202,17 @@ class DatabaseService:
     def get_asset_transactions(self, asset_id: str) -> List[AssetTransactionModel]:
         """Get all transactions for an asset"""
         return self.db.query(AssetTransactionModel).filter(AssetTransactionModel.asset_id == asset_id).all()
+    
+    def get_portfolio_transactions(self, portfolio_id: str) -> List[AssetTransactionModel]:
+        """Get all transactions for a portfolio (including historical transactions from deleted assets)"""
+        # Query directly by portfolio_id to include transactions from deleted assets
+        transactions = (
+            self.db.query(AssetTransactionModel)
+            .filter(AssetTransactionModel.portfolio_id == portfolio_id)
+            .order_by(AssetTransactionModel.timestamp.desc())
+            .all()
+        )
+        return transactions
     
     def recalculate_asset_from_transactions(self, asset_id: str, current_price: float) -> Optional[PortfolioAssetModel]:
         """Recalculate asset values based on all transactions"""
@@ -171,14 +228,13 @@ class DatabaseService:
         total_sold = sum(t.amount for t in sell_transactions)
         current_amount = total_bought - total_sold
         
-        if current_amount <= 0:
-            # Delete asset if no holdings remain
-            self.delete_asset(asset_id)
-            return None
+        # Keep the asset even if fully sold (for historical tracking)
+        if current_amount < 0:
+            current_amount = 0  # Prevent negative amounts
         
         # Calculate weighted average buy price
         total_cost = sum(t.total_value for t in buy_transactions)
         average_buy_price = total_cost / total_bought if total_bought > 0 else 0
         
-        # Update asset
+        # Update asset (even if amount is 0)
         return self.update_asset(asset_id, current_amount, average_buy_price, current_price)
