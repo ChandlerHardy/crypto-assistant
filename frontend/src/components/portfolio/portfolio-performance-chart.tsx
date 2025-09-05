@@ -86,8 +86,8 @@ export function PortfolioPerformanceChart({ portfolio }: PortfolioPerformanceCha
   const isPositive = portfolio.totalProfitLoss >= 0;
 
   return (
-    <div className="w-full h-80 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-      <div className="mb-4">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="p-4 pb-0">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Portfolio Performance
         </h3>
@@ -102,7 +102,8 @@ export function PortfolioPerformanceChart({ portfolio }: PortfolioPerformanceCha
         </div>
       </div>
       
-      <ResponsiveContainer width="100%" height="100%">
+      <div className="h-64 p-4">
+        <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
           <XAxis 
@@ -139,10 +140,13 @@ export function PortfolioPerformanceChart({ portfolio }: PortfolioPerformanceCha
             activeDot={{ r: 4, fill: isPositive ? '#10b981' : '#ef4444' }}
           />
         </LineChart>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
       
-      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-        💡 Future: Real-time snapshots, time range filters (1D, 1W, 1M, 1Y), and advanced analytics
+      <div className="px-4 pb-4">
+        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          💡 Future: Real-time snapshots, time range filters (1D, 1W, 1M, 1Y), and advanced analytics
+        </div>
       </div>
     </div>
   );
