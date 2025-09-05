@@ -61,8 +61,8 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
       const cappedAmount = currentAsset.amount;
       setAmount(cappedAmount.toString());
       
-      const confirmMessage = `You only have ${currentAsset.amount} ${currentAsset.symbol.toUpperCase()}. ` +
-        `The amount has been adjusted to sell your entire holding (${cappedAmount} ${currentAsset.symbol.toUpperCase()}). Continue?`;
+      const confirmMessage = `You only have ${parseFloat(currentAsset.amount.toFixed(8))} ${currentAsset.symbol.toUpperCase()}. ` +
+        `The amount has been adjusted to sell your entire holding (${parseFloat(cappedAmount.toFixed(8))} ${currentAsset.symbol.toUpperCase()}). Continue?`;
       
       if (!confirm(confirmMessage)) {
         return;
@@ -154,38 +154,43 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
 
         {/* Asset Summary */}
         <div className="p-6 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="space-y-4">
+            {/* Holdings - Full width to prevent overflow */}
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">Holdings</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {currentAsset.amount} {currentAsset.symbol.toUpperCase()}
+              <p className="text-lg font-semibold text-gray-900 dark:text-white break-all">
+                {parseFloat(currentAsset.amount.toFixed(8))} {currentAsset.symbol.toUpperCase()}
               </p>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Current Price</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                ${currentAsset.currentPrice.toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Total Value</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                ${currentAsset.totalValue.toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">P&L</p>
-              <div className="flex items-center space-x-1">
-                {currentAsset.profitLossPercentage >= 0 ? (
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                ) : (
-                  <TrendingDown className="w-4 h-4 text-red-600" />
-                )}
-                <p className={`text-lg font-semibold ${
-                  currentAsset.profitLossPercentage >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {currentAsset.profitLossPercentage >= 0 ? '+' : ''}{currentAsset.profitLossPercentage.toFixed(2)}%
+            
+            {/* Price and Value Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Current Price</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  ${currentAsset.currentPrice.toLocaleString()}
                 </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total Value</p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  ${currentAsset.totalValue.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">P&L</p>
+                <div className="flex items-center space-x-1">
+                  {currentAsset.profitLossPercentage >= 0 ? (
+                    <TrendingUp className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4 text-red-600" />
+                  )}
+                  <p className={`text-lg font-semibold ${
+                    currentAsset.profitLossPercentage >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {currentAsset.profitLossPercentage >= 0 ? '+' : ''}{currentAsset.profitLossPercentage.toFixed(2)}%
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -328,7 +333,7 @@ export function AssetDetailModal({ isOpen, onClose, asset, portfolioId, portfoli
                 {transactionType === 'sell' && (
                   <div className="flex items-center justify-between mt-1">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Available: {currentAsset.amount} {currentAsset.symbol.toUpperCase()}
+                      Available: {parseFloat(currentAsset.amount.toFixed(8))} {currentAsset.symbol.toUpperCase()}
                     </p>
                     <button
                       type="button"
