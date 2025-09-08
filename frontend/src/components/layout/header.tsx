@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Wallet, Settings, Menu, Bot } from 'lucide-react';
+import { Settings, Menu, Bot } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export function Header() {
@@ -11,11 +11,18 @@ export function Header() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Image
-            src="/cryptassist-transparent-bg.png"
+            src="/cryptassist-transparent-bg.png?v=2"
             alt="Crypto Portfolio"
             width={240}
             height={60}
-            className="h-15"
+            className="h-15 block dark:hidden"
+          />
+          <Image
+            src="/cryptassist-transparent-bg-white.png?v=1"
+            alt="Crypto Portfolio"
+            width={240}
+            height={60}
+            className="h-15 hidden dark:block"
           />
         </div>
         
@@ -25,13 +32,6 @@ export function Header() {
             className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium"
           >
             Dashboard
-          </Link>
-          <Link 
-            href="/portfolio" 
-            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium flex items-center space-x-1"
-          >
-            <Wallet className="h-4 w-4" />
-            <span>Portfolio</span>
           </Link>
           <Link 
             href="/assistant" 

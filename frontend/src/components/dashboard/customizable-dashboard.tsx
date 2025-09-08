@@ -25,13 +25,19 @@ interface CustomizableDashboardProps {
   performanceChart: React.ReactNode;
   portfolioList: React.ReactNode;
   topCryptos: React.ReactNode;
+  isCustomizing: boolean;
+  onCustomizingChange: (customizing: boolean) => void;
+  onResetToDefault: () => void;
 }
 
 export function CustomizableDashboard({
   summaryCards,
   performanceChart,
   portfolioList,
-  topCryptos
+  topCryptos,
+  isCustomizing,
+  onCustomizingChange,
+  onResetToDefault
 }: CustomizableDashboardProps) {
   const {
     enabledSections,
@@ -43,7 +49,6 @@ export function CustomizableDashboard({
     layout
   } = useDashboardLayout();
 
-  const [isCustomizing, setIsCustomizing] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -95,42 +100,6 @@ export function CustomizableDashboard({
 
   return (
     <div className="relative">
-      {/* Dashboard Header with Controls */}
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Portfolio Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Track your cryptocurrency investments</p>
-        </div>
-        
-        {/* Dashboard Controls with Glassmorphism */}
-        <div className="flex items-center space-x-2">
-          {isCustomizing && (
-            <>
-              <button
-                onClick={resetToDefault}
-                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-600/50 rounded-lg shadow-lg hover:bg-white/90 dark:hover:bg-gray-800/90 transition-all backdrop-blur-md backdrop-saturate-150"
-              >
-                <RotateCcw className="w-4 h-4 mr-1" />
-                Reset
-              </button>
-              <div className="text-xs text-gray-500 dark:text-gray-400 bg-white/80 dark:bg-gray-800/80 px-3 py-2 rounded-lg shadow border border-gray-200/50 dark:border-gray-600/50 backdrop-blur-md backdrop-saturate-150 max-w-48">
-                Drag to reorder • Click eye to hide/show
-              </div>
-            </>
-          )}
-          <button
-            onClick={() => setIsCustomizing(!isCustomizing)}
-            className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg shadow-lg transition-all ${
-              isCustomizing
-                ? 'bg-gradient-to-br from-blue-500/90 to-blue-600/90 text-white hover:from-blue-600/90 hover:to-blue-700/90 border border-blue-400/50 backdrop-blur-sm'
-                : 'text-gray-700 dark:text-gray-300 bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-600/50 hover:bg-white/90 dark:hover:bg-gray-800/90 backdrop-blur-md backdrop-saturate-150'
-            }`}
-          >
-            <Settings className="w-4 h-4 mr-1" />
-            {isCustomizing ? 'Done' : 'Customize'}
-          </button>
-        </div>
-      </div>
 
       {/* Dashboard Grid */}
       <DndContext

@@ -14,7 +14,17 @@ import { CryptoList } from '@/components/crypto/crypto-list';
 import { Wallet, TrendingUp, TrendingDown, Plus, X, Trash2, History } from 'lucide-react';
 import { Portfolio, PortfolioAsset } from '@/types/crypto';
 
-export function PortfolioOverview() {
+interface PortfolioOverviewProps {
+  isCustomizing: boolean;
+  onCustomizingChange: (customizing: boolean) => void;
+  onResetToDefault: () => void;
+}
+
+export function PortfolioOverview({ 
+  isCustomizing, 
+  onCustomizingChange, 
+  onResetToDefault 
+}: PortfolioOverviewProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
   const [isAssetDetailModalOpen, setIsAssetDetailModalOpen] = useState(false);
@@ -457,6 +467,9 @@ export function PortfolioOverview() {
         performanceChart={performanceChartSection}
         portfolioList={portfolioListSection}
         topCryptos={topCryptosSection}
+        isCustomizing={isCustomizing}
+        onCustomizingChange={onCustomizingChange}
+        onResetToDefault={onResetToDefault}
       />
 
       {/* Create Portfolio Modal for when portfolios exist */}
