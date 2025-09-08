@@ -1,3 +1,5 @@
+'use client';
+
 import { Header } from '@/components/layout/header';
 import { PortfolioOverview } from '@/components/portfolio/portfolio-overview';
 import { AIAssistantPopup } from '@/components/chatbot/ai-assistant-popup';
@@ -17,7 +19,11 @@ export default function PortfolioPage() {
           </p>
         </div>
 
-        <PortfolioOverview />
+        <PortfolioOverview 
+          isCustomizing={false}
+          onCustomizingChange={() => {}}
+          onResetToDefault={() => {}}
+        />
       </main>
 
       {/* AI Assistant Popup */}
