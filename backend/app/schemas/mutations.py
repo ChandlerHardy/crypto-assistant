@@ -48,6 +48,59 @@ class Mutation:
             db.close()
     
     @strawberry.mutation
+    async def create_admin_user(self, email: str, password: str, admin_secret: str) -> AuthResponse:
+        """Create an admin user (requires admin secret)"""
+        import os
+        
+        # Check admin secret
+        expected_secret = os.getenv("ADMIN_SECRET", "change-this-in-production")
+        if admin_secret != expected_secret:
+            raise Exception("Invalid admin secret")
+        
+        # Validate email format
+        if not validate_email(email):
+            raise Exception("Invalid email format")
+        
+        # Validate password strength
+        is_valid, message = validate_password(password)
+        if not is_valid:
+            raise Exception(message)
+        
+        # Get database session
+        db = next(get_db())
+        try:
+            # Check if user already exists
+            from app.utils.auth import get_user_by_email, create_admin_user
+            existing_user = get_user_by_email(db, email)
+            if existing_user:
+                raise Exception("User with this email already exists")
+            
+            # Create new admin user
+            user_model = create_admin_user(db, email, password)
+            
+            # Create access token
+            access_token = create_access_token(data={"sub": user_model.id})
+            
+            # Convert to GraphQL types
+            user = User(
+                id=user_model.id,
+                email=user_model.email,
+                is_active=user_model.is_active,
+                is_verified=user_model.is_verified,
+                is_admin=user_model.is_admin,
+                created_at=user_model.created_at,
+                last_login=user_model.last_login
+            )
+            
+            return AuthResponse(
+                user=user,
+                access_token=access_token
+            )
+            
+        finally:
+            db.close()
+    
+    @strawberry.mutation
     async def delete_portfolio(self, portfolio_id: str = strawberry.argument(name="portfolioId")) -> bool:
         """Delete a portfolio"""
         with DatabaseService() as db_service:
@@ -412,6 +465,60 @@ Be detailed, analytical, and focus on current market conditions with specific, t
                 email=user_model.email,
                 is_active=user_model.is_active,
                 is_verified=user_model.is_verified,
+                is_admin=user_model.is_admin,
+                created_at=user_model.created_at,
+                last_login=user_model.last_login
+            )
+            
+            return AuthResponse(
+                user=user,
+                access_token=access_token
+            )
+            
+        finally:
+            db.close()
+    
+    @strawberry.mutation
+    async def create_admin_user(self, email: str, password: str, admin_secret: str) -> AuthResponse:
+        """Create an admin user (requires admin secret)"""
+        import os
+        
+        # Check admin secret
+        expected_secret = os.getenv("ADMIN_SECRET", "change-this-in-production")
+        if admin_secret != expected_secret:
+            raise Exception("Invalid admin secret")
+        
+        # Validate email format
+        if not validate_email(email):
+            raise Exception("Invalid email format")
+        
+        # Validate password strength
+        is_valid, message = validate_password(password)
+        if not is_valid:
+            raise Exception(message)
+        
+        # Get database session
+        db = next(get_db())
+        try:
+            # Check if user already exists
+            from app.utils.auth import get_user_by_email, create_admin_user
+            existing_user = get_user_by_email(db, email)
+            if existing_user:
+                raise Exception("User with this email already exists")
+            
+            # Create new admin user
+            user_model = create_admin_user(db, email, password)
+            
+            # Create access token
+            access_token = create_access_token(data={"sub": user_model.id})
+            
+            # Convert to GraphQL types
+            user = User(
+                id=user_model.id,
+                email=user_model.email,
+                is_active=user_model.is_active,
+                is_verified=user_model.is_verified,
+                is_admin=user_model.is_admin,
                 created_at=user_model.created_at,
                 last_login=user_model.last_login
             )
@@ -447,6 +554,60 @@ Be detailed, analytical, and focus on current market conditions with specific, t
                 email=user_model.email,
                 is_active=user_model.is_active,
                 is_verified=user_model.is_verified,
+                is_admin=user_model.is_admin,
+                created_at=user_model.created_at,
+                last_login=user_model.last_login
+            )
+            
+            return AuthResponse(
+                user=user,
+                access_token=access_token
+            )
+            
+        finally:
+            db.close()
+    
+    @strawberry.mutation
+    async def create_admin_user(self, email: str, password: str, admin_secret: str) -> AuthResponse:
+        """Create an admin user (requires admin secret)"""
+        import os
+        
+        # Check admin secret
+        expected_secret = os.getenv("ADMIN_SECRET", "change-this-in-production")
+        if admin_secret != expected_secret:
+            raise Exception("Invalid admin secret")
+        
+        # Validate email format
+        if not validate_email(email):
+            raise Exception("Invalid email format")
+        
+        # Validate password strength
+        is_valid, message = validate_password(password)
+        if not is_valid:
+            raise Exception(message)
+        
+        # Get database session
+        db = next(get_db())
+        try:
+            # Check if user already exists
+            from app.utils.auth import get_user_by_email, create_admin_user
+            existing_user = get_user_by_email(db, email)
+            if existing_user:
+                raise Exception("User with this email already exists")
+            
+            # Create new admin user
+            user_model = create_admin_user(db, email, password)
+            
+            # Create access token
+            access_token = create_access_token(data={"sub": user_model.id})
+            
+            # Convert to GraphQL types
+            user = User(
+                id=user_model.id,
+                email=user_model.email,
+                is_active=user_model.is_active,
+                is_verified=user_model.is_verified,
+                is_admin=user_model.is_admin,
                 created_at=user_model.created_at,
                 last_login=user_model.last_login
             )

@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 from app.schemas.schema import schema
@@ -26,8 +26,50 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# GraphQL endpoint
-graphql_app = GraphQLRouter(schema)
+# GraphQL endpoint with admin-only playground access  
+async def check_admin_or_debug_access(request):
+    """Check if user has admin access or if we're in debug mode"""
+    # Always allow in debug mode (local development)
+    debug_mode = os.getenv("DEBUG", "false").lower() == "true"
+    if debug_mode:
+        return True
+    
+    # In production, check if user is admin
+    authorization = request.headers.get("authorization", "")
+    if not authorization.startswith("Bearer "):
+        return False
+    
+    token = authorization.split(" ")[1]
+    
+    from app.database.connection import get_db
+    from app.utils.auth import get_current_user_from_token, is_user_admin
+    
+    db = next(get_db())
+    try:
+        current_user = get_current_user_from_token(token, db)
+        return is_user_admin(current_user)
+    except:
+        return False
+    finally:
+        db.close()
+
+# Custom GraphQL app with admin-only playground in production
+from strawberry.fastapi import GraphQLRouter
+from fastapi import HTTPException
+
+class AdminControlledGraphQLRouter(GraphQLRouter):
+    async def render_graphiql_page(self, request: Request):
+        """Override GraphiQL rendering to check admin access"""
+        is_allowed = await check_admin_or_debug_access(request)
+        if not is_allowed:
+            raise HTTPException(
+                status_code=403,
+                detail="GraphQL playground access restricted to administrators. Please login with admin credentials."
+            )
+        return await super().render_graphiql_page(request)
+
+# Create GraphQL router with admin controls
+graphql_app = AdminControlledGraphQLRouter(schema, graphiql=True)
 app.include_router(graphql_app, prefix="/cryptassist/graphql")
 
 @app.get("/")

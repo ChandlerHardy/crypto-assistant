@@ -68,19 +68,28 @@ def get_user_by_id(db: Session, user_id: str) -> Optional[UserModel]:
     """Get user by ID"""
     return db.query(UserModel).filter(UserModel.id == user_id).first()
 
-def create_user(db: Session, email: str, password: str) -> UserModel:
+def create_user(db: Session, email: str, password: str, is_admin: bool = False) -> UserModel:
     """Create a new user"""
     hashed_password = hash_password(password)
     user = UserModel(
         email=email,
         hashed_password=hashed_password,
         is_active=True,
-        is_verified=False
+        is_verified=False,
+        is_admin=is_admin
     )
     db.add(user)
     db.commit()
     db.refresh(user)
     return user
+
+def create_admin_user(db: Session, email: str, password: str) -> UserModel:
+    """Create a new admin user"""
+    return create_user(db, email, password, is_admin=True)
+
+def is_user_admin(user: UserModel) -> bool:
+    """Check if user is an admin"""
+    return user.is_admin if user else False
 
 def authenticate_user(db: Session, email: str, password: str) -> Optional[UserModel]:
     """Authenticate user by email and password"""

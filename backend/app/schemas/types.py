@@ -111,6 +111,7 @@ class User:
     email: str
     is_active: bool = strawberry.field(name="isActive")
     is_verified: bool = strawberry.field(name="isVerified")
+    is_admin: bool = strawberry.field(name="isAdmin")
     created_at: datetime = strawberry.field(name="createdAt")
     last_login: Optional[datetime] = strawberry.field(name="lastLogin", default=None)
 

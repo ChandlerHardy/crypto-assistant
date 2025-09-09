@@ -26,9 +26,17 @@ Crypto Portfolio Analyzer - A real-time cryptocurrency portfolio tracking and an
 **Backend (.env on OCI server):**
 - `GITHUB_TOKEN=ghp_***` (for AI chat)
 - `CORS_ORIGINS=https://cryptassist.chandlerhardy.com,https://backend.chandlerhardy.com`
+- `ADMIN_SECRET=change-this-in-production` (for creating admin users)
 
 **Frontend (Vercel):**
 - `NEXT_PUBLIC_GRAPHQL_URL=https://backend.chandlerhardy.com/cryptassist/graphql`
+
+## 🔑 Admin Credentials
+**For GraphQL Playground & Admin Operations:**
+- **Email**: `admin@cryptassist.com`
+- **Password**: `AdminPass123!`
+- **Access**: Admin-only GraphQL playground access at `/cryptassist/graphql`
+- **Usage**: Login via GraphQL, use returned JWT token for playground access
 
 ## 🛠️ Common Commands
 ```bash
@@ -69,10 +77,11 @@ crypto-assistant/
 │   ├── src/types/crypto.ts       # TypeScript interfaces
 │   └── src/lib/apollo-client.ts  # GraphQL client setup
 ├── backend/
-│   ├── app/schemas/mutations.py  # GraphQL mutations (AI chat & auth)
+│   ├── app/main.py               # FastAPI app with admin GraphQL router
+│   ├── app/schemas/mutations.py  # GraphQL mutations (AI, auth, admin)
 │   ├── app/schemas/queries.py    # GraphQL queries (auth-aware)
-│   ├── app/utils/auth.py         # JWT & password utilities
-│   ├── app/database/models.py    # User & portfolio models
+│   ├── app/utils/auth.py         # JWT, password, admin utilities
+│   ├── app/database/models.py    # User & portfolio models (with is_admin)
 │   ├── app/services/ai_service.py # GitHub Llama integration
 │   ├── app/core/config.py        # Environment config
 │   └── docker-compose.backend.yml # Production container config
@@ -103,7 +112,7 @@ crypto-assistant/
 - ✅ Comprehensive transaction ledger with historical preservation
 - ✅ Realized P&L tracking with FIFO cost basis calculation
 - ✅ Auto-modal closure and user feedback improvements
-- ✅ **User Authentication System** (Latest - Completed)
+- ✅ **User Authentication System** (Completed)
   - Complete backend auth with JWT tokens and bcrypt password hashing
   - Frontend auth components with form validation
   - Login/Register forms with glassmorphism design
@@ -112,6 +121,13 @@ crypto-assistant/
   - User-specific portfolio isolation and security
   - Authentication-aware GraphQL queries and mutations
   - Protected routes and welcome landing page for unauthenticated users
+- ✅ **Admin System & GraphQL Security** (Latest - Completed)
+  - Admin user role system with `is_admin` database field
+  - Admin-only GraphQL playground access in production
+  - `createAdminUser` mutation with admin secret protection
+  - Debug mode for unrestricted local development access
+  - Role-based access control for sensitive operations
+  - Production security while maintaining developer experience
 
 ## 🔄 Development Workflow
 1. **Make changes** locally in frontend/ or backend/
@@ -228,7 +244,7 @@ const { user, isAuthenticated, login, logout } = useAuth();
 ```
 
 ## 📊 Database Schema (Key Models)
-- **User**: id, email, hashed_password, is_active, is_verified, created_at, updated_at, last_login
+- **User**: id, email, hashed_password, is_active, is_verified, **is_admin**, created_at, updated_at, last_login
 - **Portfolio**: id, name, totalValue, totalProfitLoss, totalRealizedProfitLoss, totalCostBasis, user_id, assets[]
 - **PortfolioAsset**: id, symbol, amount, currentPrice, profitLoss, transactions[]
 - **AssetTransaction**: id, type (buy/sell), amount, pricePerUnit, realizedProfitLoss, timestamp, portfolioId
@@ -249,16 +265,24 @@ mutation AddTransaction($input: AddTransactionInput)
 # Authentication Mutations
 mutation Register($input: RegisterInput!) { 
   register(input: $input) { 
-    user { id, email, isActive, isVerified, createdAt, lastLogin }
+    user { id, email, isActive, isVerified, isAdmin, createdAt, lastLogin }
     accessToken
     tokenType
   }
 }
 mutation Login($input: LoginInput!) { 
   login(input: $input) { 
-    user { id, email, isActive, isVerified, createdAt, lastLogin }
+    user { id, email, isActive, isVerified, isAdmin, createdAt, lastLogin }
     accessToken
     tokenType
+  }
+}
+
+# Admin Mutations (requires ADMIN_SECRET)
+mutation CreateAdminUser($email: String!, $password: String!, $adminSecret: String!) {
+  createAdminUser(email: $email, password: $password, adminSecret: $adminSecret) {
+    user { id, email, isAdmin }
+    accessToken
   }
 }
 ```
