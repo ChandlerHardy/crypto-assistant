@@ -1,9 +1,12 @@
 import strawberry
 from typing import List, Optional
 from datetime import datetime
+from fastapi import Request
 from app.schemas.types import CryptoCurrency, Portfolio, PortfolioAsset, AssetTransaction, PriceData
 from app.services.crypto_api import crypto_api_service
 from app.services.database_service import DatabaseService
+from app.utils.auth import get_current_user_from_token
+from app.database.connection import get_db
 
 @strawberry.type
 class Query:
@@ -89,63 +92,83 @@ class Query:
             return None
     
     @strawberry.field
-    async def portfolios(self) -> List[Portfolio]:
-        """Get all user portfolios"""
-        with DatabaseService() as db_service:
-            portfolio_models = db_service.get_all_portfolios()
-            portfolios = []
+    async def portfolios(self, info) -> List[Portfolio]:
+        """Get user portfolios (requires authentication)"""
+        # Extract JWT token from request headers
+        request = info.context["request"]
+        authorization = request.headers.get("authorization", "")
+        
+        if not authorization.startswith("Bearer "):
+            # Return empty list for unauthenticated users
+            return []
+        
+        token = authorization.split(" ")[1]
+        
+        # Get current user from token
+        db = next(get_db())
+        try:
+            current_user = get_current_user_from_token(token, db)
+            if not current_user:
+                return []
             
-            for portfolio_model in portfolio_models:
-                # Convert only active assets (amount > 0) to GraphQL types for main display
-                active_assets = db_service.get_active_portfolio_assets(portfolio_model.id)
-                assets = []
-                for asset_model in active_assets:
-                    # Get transactions for this asset
-                    transaction_models = db_service.get_asset_transactions(asset_model.id)
-                    transactions = [
-                        AssetTransaction(
-                            id=t.id,
-                            transaction_type=t.transaction_type,
-                            amount=t.amount,
-                            price_per_unit=t.price_per_unit,
-                            total_value=t.total_value,
-                            realized_profit_loss=t.realized_profit_loss,
-                            timestamp=t.timestamp,
-                            notes=t.notes
-                        ) for t in transaction_models
-                    ]
-                    
-                    asset = PortfolioAsset(
-                        id=asset_model.id,
-                        crypto_id=asset_model.crypto_id,
-                        symbol=asset_model.symbol,
-                        name=asset_model.name,
-                        amount=asset_model.amount,
-                        average_buy_price=asset_model.average_buy_price,
-                        current_price=asset_model.current_price,
-                        total_value=asset_model.total_value,
-                        profit_loss=asset_model.profit_loss,
-                        profit_loss_percentage=asset_model.profit_loss_percentage,
-                        transactions=transactions
-                    )
-                    assets.append(asset)
+            # Get portfolios for this user
+            with DatabaseService() as db_service:
+                portfolio_models = db_service.get_portfolios_by_user(current_user.id)
+                portfolios = []
                 
-                portfolio = Portfolio(
-                    id=portfolio_model.id,
-                    name=portfolio_model.name,
-                    description=portfolio_model.description,
-                    total_value=portfolio_model.total_value,
-                    total_profit_loss=portfolio_model.total_profit_loss,
-                    total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
-                    total_realized_profit_loss=portfolio_model.total_realized_profit_loss,
-                    total_cost_basis=portfolio_model.total_cost_basis,
-                    assets=assets,
-                    created_at=portfolio_model.created_at,
-                    updated_at=portfolio_model.updated_at
-                )
-                portfolios.append(portfolio)
-            
-            return portfolios
+                for portfolio_model in portfolio_models:
+                    # Convert only active assets (amount > 0) to GraphQL types for main display
+                    active_assets = db_service.get_active_portfolio_assets(portfolio_model.id)
+                    assets = []
+                    for asset_model in active_assets:
+                        # Get transactions for this asset
+                        transaction_models = db_service.get_asset_transactions(asset_model.id)
+                        transactions = [
+                            AssetTransaction(
+                                id=t.id,
+                                transaction_type=t.transaction_type,
+                                amount=t.amount,
+                                price_per_unit=t.price_per_unit,
+                                total_value=t.total_value,
+                                realized_profit_loss=t.realized_profit_loss,
+                                timestamp=t.timestamp,
+                                notes=t.notes
+                            ) for t in transaction_models
+                        ]
+                        
+                        asset = PortfolioAsset(
+                            id=asset_model.id,
+                            crypto_id=asset_model.crypto_id,
+                            symbol=asset_model.symbol,
+                            name=asset_model.name,
+                            amount=asset_model.amount,
+                            average_buy_price=asset_model.average_buy_price,
+                            current_price=asset_model.current_price,
+                            total_value=asset_model.total_value,
+                            profit_loss=asset_model.profit_loss,
+                            profit_loss_percentage=asset_model.profit_loss_percentage,
+                            transactions=transactions
+                        )
+                        assets.append(asset)
+                    
+                    portfolio = Portfolio(
+                        id=portfolio_model.id,
+                        name=portfolio_model.name,
+                        description=portfolio_model.description,
+                        total_value=portfolio_model.total_value,
+                        total_profit_loss=portfolio_model.total_profit_loss,
+                        total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
+                        total_realized_profit_loss=portfolio_model.total_realized_profit_loss,
+                        total_cost_basis=portfolio_model.total_cost_basis,
+                        assets=assets,
+                        created_at=portfolio_model.created_at,
+                        updated_at=portfolio_model.updated_at
+                    )
+                    portfolios.append(portfolio)
+                
+                return portfolios
+        finally:
+            db.close()
     
     @strawberry.field
     async def portfolio(self, id: str) -> Optional[Portfolio]:

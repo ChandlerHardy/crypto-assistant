@@ -72,3 +72,28 @@ export interface PriceData {
   timestamp: string;
   price: number;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  isActive: boolean;
+  isVerified: boolean;
+  createdAt: string;
+  lastLogin?: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+  tokenType: string;
+}
+
+export interface RegisterInput {
+  email: string;
+  password: string;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}

@@ -4,14 +4,17 @@ import { setContext } from '@apollo/client/link/context';
 import { registerApolloClient } from '@apollo/experimental-nextjs-app-support/rsc';
 
 const httpLink = createHttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:8000/graphql',
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:8000/cryptassist/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {
+  // Get the authentication token from local storage if it exists
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  
   return {
     headers: {
       ...headers,
-      // Add auth headers here if needed
+      authorization: token ? `Bearer ${token}` : '',
     }
   }
 });

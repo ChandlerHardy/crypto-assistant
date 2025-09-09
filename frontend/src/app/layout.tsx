@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ApolloWrapper } from "@/lib/apollo-wrapper";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { AuthProvider } from "@/components/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,9 +51,11 @@ export default function RootLayout({
           storageKey="crypto-analyzer-theme"
           value={{ light: "light", dark: "dark" }}
         >
-          <ApolloWrapper>
-            {children}
-          </ApolloWrapper>
+          <AuthProvider>
+            <ApolloWrapper>
+              {children}
+            </ApolloWrapper>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

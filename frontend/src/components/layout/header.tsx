@@ -2,12 +2,29 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Settings, Menu, Bot } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, Menu, Bot, User, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { useAuth, AuthModal } from '@/components/auth';
 
 export function Header() {
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  const handleLogin = () => {
+    setAuthMode('login');
+    setAuthModalOpen(true);
+  };
+
+  const handleRegister = () => {
+    setAuthMode('register');
+    setAuthModalOpen(true);
+  };
+
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+    <>
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Image
@@ -48,15 +65,68 @@ export function Header() {
             <span>Settings</span>
           </Link>
           <ThemeToggle />
+          
+          {/* Authentication Section */}
+          {!isLoading && (
+            <div className="flex items-center space-x-4">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {user?.email}
+                    </span>
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-sm">Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleLogin}
+                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={handleRegister}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </nav>
         
         <div className="md:hidden flex items-center space-x-2">
           <ThemeToggle />
+          {!isLoading && !isAuthenticated && (
+            <button
+              onClick={handleLogin}
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm"
+            >
+              Sign In
+            </button>
+          )}
           <button>
             <Menu className="h-6 w-6 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
       </div>
-    </header>
+      </header>
+      
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        initialMode={authMode}
+      />
+    </>
   );
 }

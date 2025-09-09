@@ -63,12 +63,16 @@ curl -X POST "https://backend.chandlerhardy.com/cryptassist/graphql" \
 ```
 crypto-assistant/
 ├── frontend/
+│   ├── src/components/auth/      # Authentication components
 │   ├── src/components/chatbot/    # AI chat components
 │   ├── src/lib/graphql/          # GraphQL queries/mutations
 │   ├── src/types/crypto.ts       # TypeScript interfaces
 │   └── src/lib/apollo-client.ts  # GraphQL client setup
 ├── backend/
-│   ├── app/schemas/mutations.py  # GraphQL mutations (AI chat here)
+│   ├── app/schemas/mutations.py  # GraphQL mutations (AI chat & auth)
+│   ├── app/schemas/queries.py    # GraphQL queries (auth-aware)
+│   ├── app/utils/auth.py         # JWT & password utilities
+│   ├── app/database/models.py    # User & portfolio models
 │   ├── app/services/ai_service.py # GitHub Llama integration
 │   ├── app/core/config.py        # Environment config
 │   └── docker-compose.backend.yml # Production container config
@@ -89,7 +93,7 @@ crypto-assistant/
 - ✅ Portfolio data integration with AI responses
 - ✅ GitHub Llama AI model integration
 - ✅ Production deployment with SSL/HTTPS
-- ✅ **Customizable Dashboard System** (Latest)
+- ✅ **Customizable Dashboard System**
   - Drag-and-drop reordering of dashboard sections
   - Fixed crypto sidebar with main content reordering
   - Glassmorphism effects on all controls
@@ -99,6 +103,15 @@ crypto-assistant/
 - ✅ Comprehensive transaction ledger with historical preservation
 - ✅ Realized P&L tracking with FIFO cost basis calculation
 - ✅ Auto-modal closure and user feedback improvements
+- ✅ **User Authentication System** (Latest - Completed)
+  - Complete backend auth with JWT tokens and bcrypt password hashing
+  - Frontend auth components with form validation
+  - Login/Register forms with glassmorphism design
+  - Auth context with localStorage persistence
+  - Email validation and strong password requirements
+  - User-specific portfolio isolation and security
+  - Authentication-aware GraphQL queries and mutations
+  - Protected routes and welcome landing page for unauthenticated users
 
 ## 🔄 Development Workflow
 1. **Make changes** locally in frontend/ or backend/
@@ -161,8 +174,62 @@ crypto-assistant/
 - Create DashboardCustomizer component with drag handles
 - Implement visual feedback during drag operations
 
+## 🔐 Authentication System (✅ Completed)
+
+### ✅ Completed Components
+**Backend:**
+- ✅ User model with proper database relationships (`UserModel` in `models.py`)
+- ✅ Password hashing with bcrypt (`app/utils/auth.py`)
+- ✅ JWT token authentication system
+- ✅ GraphQL register/login mutations (`mutations.py`)
+- ✅ Email validation and strong password requirements
+- ✅ Database migration script (`init_db.py`)
+
+**Frontend:**
+- ✅ Authentication GraphQL mutations (`REGISTER`, `LOGIN`)
+- ✅ TypeScript types (`User`, `AuthResponse`, `RegisterInput`, `LoginInput`)
+- ✅ Authentication context with localStorage (`AuthContext.tsx`)
+- ✅ Login form with validation (`LoginForm.tsx`)
+- ✅ Register form with strong password requirements (`RegisterForm.tsx`)
+- ✅ Combined authentication modal (`AuthModal.tsx`)
+- ✅ Clean component exports (`/components/auth/index.ts`)
+
+### 🔄 Next Steps (Optional Enhancements)
+1. **Email verification system** - Add email confirmation for new accounts
+2. **Password reset functionality** - Allow users to reset forgotten passwords
+3. **User profile management** - Edit user settings and preferences
+4. **Session management** - Handle token refresh and automatic logout
+5. **Two-factor authentication** - Add 2FA for enhanced security
+6. **Production deployment** - Deploy updated auth system to production server
+
+### 📝 Integration Guide
+```tsx
+// In your main layout (app/layout.tsx or _app.tsx):
+import { AuthProvider } from '@/components/auth';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        <AuthProvider>
+          <ApolloProvider client={client}>
+            {children}
+          </ApolloProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+
+// In any component:
+import { useAuth, AuthModal } from '@/components/auth';
+
+const { user, isAuthenticated, login, logout } = useAuth();
+```
+
 ## 📊 Database Schema (Key Models)
-- **Portfolio**: id, name, totalValue, totalProfitLoss, totalRealizedProfitLoss, totalCostBasis, assets[]
+- **User**: id, email, hashed_password, is_active, is_verified, created_at, updated_at, last_login
+- **Portfolio**: id, name, totalValue, totalProfitLoss, totalRealizedProfitLoss, totalCostBasis, user_id, assets[]
 - **PortfolioAsset**: id, symbol, amount, currentPrice, profitLoss, transactions[]
 - **AssetTransaction**: id, type (buy/sell), amount, pricePerUnit, realizedProfitLoss, timestamp, portfolioId
 
@@ -178,6 +245,22 @@ mutation ChatWithAssistant($message: String!, $context: String)
 mutation CreatePortfolio($input: CreatePortfolioInput)
 mutation AddAssetToPortfolio($input: AddAssetInput)
 mutation AddTransaction($input: AddTransactionInput)
+
+# Authentication Mutations
+mutation Register($input: RegisterInput!) { 
+  register(input: $input) { 
+    user { id, email, isActive, isVerified, createdAt, lastLogin }
+    accessToken
+    tokenType
+  }
+}
+mutation Login($input: LoginInput!) { 
+  login(input: $input) { 
+    user { id, email, isActive, isVerified, createdAt, lastLogin }
+    accessToken
+    tokenType
+  }
+}
 ```
 
 ## ⚠️ Known Issues & Considerations

@@ -104,3 +104,28 @@ class AddTransactionInput:
     amount: float
     price_per_unit: float = strawberry.field(name="pricePerUnit")
     notes: Optional[str] = None
+
+@strawberry.type
+class User:
+    id: str
+    email: str
+    is_active: bool = strawberry.field(name="isActive")
+    is_verified: bool = strawberry.field(name="isVerified")
+    created_at: datetime = strawberry.field(name="createdAt")
+    last_login: Optional[datetime] = strawberry.field(name="lastLogin", default=None)
+
+@strawberry.type
+class AuthResponse:
+    user: User
+    access_token: str = strawberry.field(name="accessToken")
+    token_type: str = strawberry.field(name="tokenType", default="bearer")
+
+@strawberry.input
+class RegisterInput:
+    email: str
+    password: str
+
+@strawberry.input
+class LoginInput:
+    email: str
+    password: str

@@ -110,3 +110,37 @@ export const ADD_TRANSACTION = gql`
     }
   }
 `;
+
+export const REGISTER = gql`
+  mutation Register($input: RegisterInput!) {
+    register(input: $input) {
+      user {
+        id
+        email
+        isActive
+        isVerified
+        createdAt
+        lastLogin
+      }
+      accessToken
+      tokenType
+    }
+  }
+`;
+
+export const LOGIN = gql`
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
+      user {
+        id
+        email
+        isActive
+        isVerified
+        createdAt
+        lastLogin
+      }
+      accessToken
+      tokenType
+    }
+  }
+`;

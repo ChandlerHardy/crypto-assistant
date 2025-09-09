@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey, Integer
+from sqlalchemy import Column, String, Float, DateTime, Text, ForeignKey, Integer, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -6,10 +6,26 @@ import uuid
 
 Base = declarative_base()
 
+class UserModel(Base):
+    __tablename__ = "users"
+    
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_login = Column(DateTime)
+    
+    # Relationships
+    portfolios = relationship("PortfolioModel", back_populates="user", cascade="all, delete-orphan")
+
 class PortfolioModel(Base):
     __tablename__ = "portfolios"
     
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
     description = Column(Text)
     total_value = Column(Float, default=0.0)
@@ -21,6 +37,7 @@ class PortfolioModel(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
+    user = relationship("UserModel", back_populates="portfolios")
     assets = relationship("PortfolioAssetModel", back_populates="portfolio", cascade="all, delete-orphan")
 
 class PortfolioAssetModel(Base):

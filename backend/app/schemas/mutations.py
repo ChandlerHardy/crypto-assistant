@@ -1,30 +1,51 @@
 import strawberry
 from typing import Optional, List, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
-from app.schemas.types import Portfolio, PortfolioAsset, AssetTransaction, CreatePortfolioInput, AddAssetInput, UpdateAssetInput, AddTransactionInput
+from app.schemas.types import Portfolio, PortfolioAsset, AssetTransaction, CreatePortfolioInput, AddAssetInput, UpdateAssetInput, AddTransactionInput, User, AuthResponse, RegisterInput, LoginInput
 from app.services.database_service import DatabaseService
-from app.database.models import PortfolioModel, PortfolioAssetModel, AssetTransactionModel
+from app.database.models import PortfolioModel, PortfolioAssetModel, AssetTransactionModel, UserModel
+from app.utils.auth import validate_email, validate_password, create_user, authenticate_user, create_access_token, get_current_user_from_token
+from app.database.connection import get_db
 
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    async def create_portfolio(self, input: CreatePortfolioInput) -> Portfolio:
-        """Create a new portfolio"""
-        with DatabaseService() as db_service:
-            portfolio_model = db_service.create_portfolio(input.name, input.description)
+    async def create_portfolio(self, input: CreatePortfolioInput, info) -> Portfolio:
+        """Create a new portfolio (requires authentication)"""
+        # Extract JWT token from request headers
+        request = info.context["request"]
+        authorization = request.headers.get("authorization", "")
+        
+        if not authorization.startswith("Bearer "):
+            raise Exception("Authentication required")
+        
+        token = authorization.split(" ")[1]
+        
+        # Get current user from token
+        db = next(get_db())
+        try:
+            current_user = get_current_user_from_token(token, db)
+            if not current_user:
+                raise Exception("Invalid authentication token")
             
-            return Portfolio(
-                id=portfolio_model.id,
-                name=portfolio_model.name,
-                description=portfolio_model.description,
-                total_value=portfolio_model.total_value,
-                total_profit_loss=portfolio_model.total_profit_loss,
-                total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
-                assets=[],
-                created_at=portfolio_model.created_at,
-                updated_at=portfolio_model.updated_at
-            )
+            # Create portfolio for this user
+            with DatabaseService() as db_service:
+                portfolio_model = db_service.create_portfolio(input.name, input.description, current_user.id)
+                
+                return Portfolio(
+                    id=portfolio_model.id,
+                    name=portfolio_model.name,
+                    description=portfolio_model.description,
+                    total_value=portfolio_model.total_value,
+                    total_profit_loss=portfolio_model.total_profit_loss,
+                    total_profit_loss_percentage=portfolio_model.total_profit_loss_percentage,
+                    assets=[],
+                    created_at=portfolio_model.created_at,
+                    updated_at=portfolio_model.updated_at
+                )
+        finally:
+            db.close()
     
     @strawberry.mutation
     async def delete_portfolio(self, portfolio_id: str = strawberry.argument(name="portfolioId")) -> bool:
@@ -357,3 +378,83 @@ Be detailed, analytical, and focus on current market conditions with specific, t
             
         except Exception as e:
             return f"I apologize, but I'm experiencing technical difficulties right now: {str(e)}. Please try again in a moment!"
+    
+    @strawberry.mutation
+    async def register(self, input: RegisterInput) -> AuthResponse:
+        """Register a new user"""
+        # Validate email format
+        if not validate_email(input.email):
+            raise Exception("Invalid email format")
+        
+        # Validate password strength
+        is_valid, message = validate_password(input.password)
+        if not is_valid:
+            raise Exception(message)
+        
+        # Get database session
+        db = next(get_db())
+        try:
+            # Check if user already exists
+            from app.utils.auth import get_user_by_email
+            existing_user = get_user_by_email(db, input.email)
+            if existing_user:
+                raise Exception("User with this email already exists")
+            
+            # Create new user
+            user_model = create_user(db, input.email, input.password)
+            
+            # Create access token
+            access_token = create_access_token(data={"sub": user_model.id})
+            
+            # Convert to GraphQL types
+            user = User(
+                id=user_model.id,
+                email=user_model.email,
+                is_active=user_model.is_active,
+                is_verified=user_model.is_verified,
+                created_at=user_model.created_at,
+                last_login=user_model.last_login
+            )
+            
+            return AuthResponse(
+                user=user,
+                access_token=access_token
+            )
+            
+        finally:
+            db.close()
+    
+    @strawberry.mutation
+    async def login(self, input: LoginInput) -> AuthResponse:
+        """Login user"""
+        # Get database session
+        db = next(get_db())
+        try:
+            # Authenticate user
+            user_model = authenticate_user(db, input.email, input.password)
+            if not user_model:
+                raise Exception("Invalid email or password")
+            
+            if not user_model.is_active:
+                raise Exception("Account is deactivated")
+            
+            # Create access token
+            access_token = create_access_token(data={"sub": user_model.id})
+            
+            # Convert to GraphQL types
+            user = User(
+                id=user_model.id,
+                email=user_model.email,
+                is_active=user_model.is_active,
+                is_verified=user_model.is_verified,
+                created_at=user_model.created_at,
+                last_login=user_model.last_login
+            )
+            
+            return AuthResponse(
+                user=user,
+                access_token=access_token
+            )
+            
+        finally:
+            db.close()

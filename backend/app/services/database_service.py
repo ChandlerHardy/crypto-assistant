@@ -20,14 +20,15 @@ class DatabaseService:
         self.db.close()
     
     # Portfolio operations
-    def create_portfolio(self, name: str, description: Optional[str] = None) -> PortfolioModel:
+    def create_portfolio(self, name: str, description: Optional[str] = None, user_id: Optional[str] = None) -> PortfolioModel:
         """Create a new portfolio"""
         portfolio = PortfolioModel(
             name=name,
             description=description,
             total_value=0.0,
             total_profit_loss=0.0,
-            total_profit_loss_percentage=0.0
+            total_profit_loss_percentage=0.0,
+            user_id=user_id
         )
         self.db.add(portfolio)
         self.db.commit()
@@ -41,6 +42,10 @@ class DatabaseService:
     def get_all_portfolios(self) -> List[PortfolioModel]:
         """Get all portfolios"""
         return self.db.query(PortfolioModel).all()
+    
+    def get_portfolios_by_user(self, user_id: str) -> List[PortfolioModel]:
+        """Get all portfolios for a specific user"""
+        return self.db.query(PortfolioModel).filter(PortfolioModel.user_id == user_id).all()
     
     def delete_portfolio(self, portfolio_id: str) -> bool:
         """Delete portfolio by ID"""
