@@ -120,13 +120,19 @@ crypto-assistant/
   - User-specific portfolio isolation and security
   - Authentication-aware GraphQL queries and mutations
   - Protected routes and welcome landing page for unauthenticated users
-- ✅ **Admin System & GraphQL Security** (Latest - Completed)
+- ✅ **Admin System & GraphQL Security** (Completed)
   - Admin user role system with `is_admin` database field
   - Admin-only GraphQL playground access in production
   - `createAdminUser` mutation with admin secret protection
   - Debug mode for unrestricted local development access
   - Role-based access control for sensitive operations
   - Production security while maintaining developer experience
+- ✅ **Cryptocurrency Market Data Integration** (Latest - Completed)
+  - Top cryptocurrencies list visible to all users (authenticated & unauthenticated)
+  - Real-time crypto prices with 24-hour change indicators
+  - Clean card-based layout with crypto icons and fallback letters
+  - Fixed authentication flow issues (modal dismissal, route redirects)
+  - Improved Apollo GraphQL client with proper JWT token authentication
 
 ## 🔄 Development Workflow
 1. **Make changes** locally in frontend/ or backend/
