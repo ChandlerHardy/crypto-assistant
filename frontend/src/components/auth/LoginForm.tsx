@@ -9,9 +9,10 @@ import { LoginInput, AuthResponse } from '@/types/crypto';
 
 interface LoginFormProps {
   onSwitchToRegister?: () => void;
+  onSuccess?: () => void;
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister, onSuccess }) => {
   const [formData, setFormData] = useState<LoginInput>({
     email: '',
     password: '',
@@ -59,7 +60,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       
       if (data?.login) {
         login(data.login);
-        router.push('/dashboard');
+        onSuccess?.();
+        router.push('/');
       }
     } catch (error) {
       console.error('Login error:', error);

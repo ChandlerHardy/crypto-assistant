@@ -31,9 +31,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </button>
         
         {mode === 'login' ? (
-          <LoginForm onSwitchToRegister={() => setMode('register')} />
+          <LoginForm 
+            onSwitchToRegister={() => setMode('register')} 
+            onSuccess={onClose}
+          />
         ) : (
-          <RegisterForm onSwitchToLogin={() => setMode('login')} />
+          <RegisterForm 
+            onSwitchToLogin={() => setMode('login')} 
+            onSuccess={onClose}
+          />
         )}
       </div>
     </div>

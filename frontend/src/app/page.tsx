@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Header } from '@/components/layout/header';
 import { PortfolioOverview } from '@/components/portfolio/portfolio-overview';
 import { PriceChart } from '@/components/charts/price-chart';
+import { CryptoList } from '@/components/crypto/crypto-list';
 import { AIAssistantPopup } from '@/components/chatbot/ai-assistant-popup';
 import { useDashboardLayout } from '@/hooks/use-dashboard-layout';
 import { useAuth, AuthModal } from '@/components/auth';
@@ -36,6 +37,11 @@ export default function Home() {
                     onCustomizingChange={setIsCustomizing}
                     onResetToDefault={handleResetToDefault}
                   />
+                </div>
+
+                {/* Top Cryptocurrencies Section - Show to authenticated users too */}
+                <div className="mb-8">
+                  <CryptoList limit={10} />
                 </div>
               </>
             ) : (
@@ -94,6 +100,11 @@ export default function Home() {
                       Your data is protected with enterprise-grade security. We never store your private keys or access your wallets.
                     </p>
                   </div>
+                </div>
+
+                {/* Top Cryptocurrencies Section - Show to non-authenticated users */}
+                <div className="mb-12">
+                  <CryptoList limit={10} />
                 </div>
               </>
             )}
