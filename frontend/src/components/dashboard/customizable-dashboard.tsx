@@ -18,7 +18,7 @@ import {
 
 import { useDashboardLayout } from '@/hooks/use-dashboard-layout';
 import { DraggableSection } from './draggable-section';
-import { Settings, RotateCcw, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface CustomizableDashboardProps {
   summaryCards: React.ReactNode;
@@ -26,8 +26,6 @@ interface CustomizableDashboardProps {
   portfolioList: React.ReactNode;
   topCryptos: React.ReactNode;
   isCustomizing: boolean;
-  onCustomizingChange: (customizing: boolean) => void;
-  onResetToDefault: () => void;
 }
 
 export function CustomizableDashboard({
@@ -35,17 +33,13 @@ export function CustomizableDashboard({
   performanceChart,
   portfolioList,
   topCryptos,
-  isCustomizing,
-  onCustomizingChange,
-  onResetToDefault
+  isCustomizing
 }: CustomizableDashboardProps) {
   const {
     enabledSections,
     isLoading,
     reorderSections,
     toggleSection,
-    updateSectionSize,
-    resetToDefault,
     layout
   } = useDashboardLayout();
 
@@ -121,7 +115,6 @@ export function CustomizableDashboard({
                     isDragging={activeId === section.id}
                     isCustomizing={isCustomizing}
                     onToggleVisibility={toggleSection}
-                    onResizeSection={updateSectionSize}
                   >
                     {renderSectionContent(section.id)}
                   </DraggableSection>

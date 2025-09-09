@@ -22,8 +22,8 @@ interface PortfolioOverviewProps {
 
 export function PortfolioOverview({ 
   isCustomizing, 
-  onCustomizingChange, 
-  onResetToDefault 
+  onCustomizingChange: _onCustomizingChange, 
+  onResetToDefault: _onResetToDefault 
 }: PortfolioOverviewProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
@@ -468,8 +468,6 @@ export function PortfolioOverview({
         portfolioList={portfolioListSection}
         topCryptos={topCryptosSection}
         isCustomizing={isCustomizing}
-        onCustomizingChange={onCustomizingChange}
-        onResetToDefault={onResetToDefault}
       />
 
       {/* Create Portfolio Modal for when portfolios exist */}

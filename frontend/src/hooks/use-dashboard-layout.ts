@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout, DashboardSection, DEFAULT_DASHBOARD_LAYOUT, DASHBOARD_PRESETS } from '@/types/dashboard';
+import { DashboardLayout, DEFAULT_DASHBOARD_LAYOUT, DASHBOARD_PRESETS } from '@/types/dashboard';
 
 const STORAGE_KEY = 'crypto-dashboard-layout';
 

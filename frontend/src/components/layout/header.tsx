@@ -26,21 +26,23 @@ export function Header() {
     <>
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Image
-            src="/cryptassist-transparent-bg.png?v=2"
-            alt="Crypto Portfolio"
-            width={240}
-            height={60}
-            className="h-15 block dark:hidden"
-          />
-          <Image
-            src="/cryptassist-transparent-bg-white.png?v=1"
-            alt="Crypto Portfolio"
-            width={240}
-            height={60}
-            className="h-15 hidden dark:block"
-          />
+        <div className="flex items-center">
+          <Link href="/" className="relative w-60 h-12 cursor-pointer">
+            <Image
+              src="/cryptassist-transparent-bg.png?v=2"
+              alt="Crypto Portfolio"
+              width={240}
+              height={60}
+              className="absolute inset-0 w-full h-full object-contain block dark:hidden"
+            />
+            <Image
+              src="/cryptassist-transparent-bg-white.png?v=1"
+              alt="Crypto Portfolio"
+              width={240}
+              height={60}
+              className="absolute inset-0 w-full h-full object-contain hidden dark:block"
+            />
+          </Link>
         </div>
         
         <nav className="hidden md:flex items-center space-x-6">

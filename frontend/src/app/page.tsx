@@ -13,7 +13,7 @@ import { Settings, RotateCcw, TrendingUp, Shield, Zap } from 'lucide-react';
 export default function Home() {
   const [isCustomizing, setIsCustomizing] = useState(false);
   const { resetToDefault } = useDashboardLayout();
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
 

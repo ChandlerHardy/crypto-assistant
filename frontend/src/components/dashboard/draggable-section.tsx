@@ -2,7 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Eye, EyeOff, GripVertical, Maximize2 } from 'lucide-react';
+import { Eye, EyeOff, GripVertical } from 'lucide-react';
 import { DashboardSection } from '@/types/dashboard';
 
 interface DraggableSectionProps {
@@ -10,7 +10,6 @@ interface DraggableSectionProps {
   isDragging?: boolean;
   isCustomizing?: boolean;
   onToggleVisibility?: (sectionId: string) => void;
-  onResizeSection?: (sectionId: string, size: 'full' | 'half' | 'quarter' | 'three-quarters') => void;
   children: React.ReactNode;
 }
 
@@ -19,7 +18,6 @@ export function DraggableSection({
   isDragging = false,
   isCustomizing = false,
   onToggleVisibility,
-  onResizeSection,
   children 
 }: DraggableSectionProps) {
   const {
@@ -27,8 +25,7 @@ export function DraggableSection({
     listeners,
     setNodeRef,
     transform,
-    transition,
-    isSorting
+    transition
   } = useSortable({
     id: section.id,
     disabled: !isCustomizing
@@ -40,32 +37,6 @@ export function DraggableSection({
     opacity: isDragging ? 0.5 : 1
   };
 
-  // Get flexbox width class based on section size  
-  const getFlexWidth = (size: string) => {
-    switch (size) {
-      case 'quarter': return 'w-full lg:w-1/4 lg:flex-none';
-      case 'half': return 'w-full lg:w-1/2 lg:flex-none';
-      case 'three-quarters': return 'w-full lg:w-3/4 lg:flex-none';
-      case 'full': 
-      default: return 'w-full lg:flex-none';
-    }
-  };
-
-  const getSizeIcon = (size: string) => {
-    switch (size) {
-      case 'quarter': return '1/4';
-      case 'half': return '1/2';
-      case 'three-quarters': return '3/4';
-      case 'full': 
-      default: return '1/1';
-    }
-  };
-
-  const getNextSize = (currentSize: string) => {
-    const sizes = ['quarter', 'half', 'three-quarters', 'full'];
-    const currentIndex = sizes.indexOf(currentSize);
-    return sizes[(currentIndex + 1) % sizes.length] as 'full' | 'half' | 'quarter' | 'three-quarters';
-  };
 
   if (!section.enabled && !isCustomizing) {
     return null;
