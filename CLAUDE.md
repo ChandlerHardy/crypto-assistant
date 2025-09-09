@@ -31,12 +31,11 @@ Crypto Portfolio Analyzer - A real-time cryptocurrency portfolio tracking and an
 **Frontend (Vercel):**
 - `NEXT_PUBLIC_GRAPHQL_URL=https://backend.chandlerhardy.com/cryptassist/graphql`
 
-## 🔑 Admin Credentials
+## 🔑 Admin Access
 **For GraphQL Playground & Admin Operations:**
-- **Email**: `admin@cryptassist.com`
-- **Password**: `AdminPass123!`
 - **Access**: Admin-only GraphQL playground access at `/cryptassist/graphql`
-- **Usage**: Login via GraphQL, use returned JWT token for playground access
+- **Usage**: Login via GraphQL with admin credentials, use returned JWT token for playground access
+- **Credentials**: Available in secure environment (not stored in public repository)
 
 ## 🛠️ Common Commands
 ```bash
