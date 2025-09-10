@@ -2,24 +2,23 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
 import { Settings, Menu, Bot, User, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { useAuth, AuthModal } from '@/components/auth';
+import { useAuth } from '@/components/auth';
 
-export function Header() {
+interface HeaderProps {
+  onOpenAuthModal?: (mode: 'login' | 'register') => void;
+}
+
+export function Header({ onOpenAuthModal }: HeaderProps = {}) {
   const { user, isAuthenticated, logout, isLoading } = useAuth();
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   const handleLogin = () => {
-    setAuthMode('login');
-    setAuthModalOpen(true);
+    onOpenAuthModal?.('login');
   };
 
   const handleRegister = () => {
-    setAuthMode('register');
-    setAuthModalOpen(true);
+    onOpenAuthModal?.('register');
   };
 
   return (
@@ -123,12 +122,6 @@ export function Header() {
         </div>
       </div>
       </header>
-      
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
-      />
     </>
   );
 }

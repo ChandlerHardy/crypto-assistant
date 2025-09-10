@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { RegisterForm } from './RegisterForm';
@@ -8,15 +8,16 @@ import { RegisterForm } from './RegisterForm';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialMode?: 'login' | 'register';
+  mode: 'login' | 'register';
+  onModeChange: (mode: 'login' | 'register') => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ 
   isOpen, 
   onClose, 
-  initialMode = 'login' 
+  mode,
+  onModeChange
 }) => {
-  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
 
   if (!isOpen) return null;
 
@@ -32,12 +33,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         
         {mode === 'login' ? (
           <LoginForm 
-            onSwitchToRegister={() => setMode('register')} 
+            onSwitchToRegister={() => onModeChange('register')} 
             onSuccess={onClose}
           />
         ) : (
           <RegisterForm 
-            onSwitchToLogin={() => setMode('login')} 
+            onSwitchToLogin={() => onModeChange('login')} 
             onSuccess={onClose}
           />
         )}

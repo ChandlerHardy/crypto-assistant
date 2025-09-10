@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery } from '@apollo/client';
 import { Header } from '@/components/layout/header';
 import { PortfolioOverview } from '@/components/portfolio/portfolio-overview';
 import { PriceChart } from '@/components/charts/price-chart';
@@ -8,6 +9,7 @@ import { CryptoList } from '@/components/crypto/crypto-list';
 import { AIAssistantPopup } from '@/components/chatbot/ai-assistant-popup';
 import { useDashboardLayout } from '@/hooks/use-dashboard-layout';
 import { useAuth, AuthModal } from '@/components/auth';
+import { GET_PORTFOLIOS } from '@/lib/graphql/queries';
 import { Settings, RotateCcw, TrendingUp, Shield, Zap } from 'lucide-react';
 
 export default function Home() {
@@ -16,14 +18,34 @@ export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
+  
+  // Query portfolios only for authenticated users to determine if we should show crypto list
+  const { data: portfolioData } = useQuery(GET_PORTFOLIOS, {
+    skip: !isAuthenticated || isLoading,
+  });
+  
+  const hasPortfolios = portfolioData?.portfolios && portfolioData.portfolios.length > 0;
 
   const handleResetToDefault = () => {
     resetToDefault();
   };
 
+  const handleOpenAuthModal = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
+  
+  const handleCloseAuthModal = () => {
+    setAuthModalOpen(false);
+  };
+  
+  const handleModeChange = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
+      <Header onOpenAuthModal={handleOpenAuthModal} />
       
       <main className="max-w-7xl mx-auto px-4 py-8">
         {!isLoading && (
@@ -39,10 +61,13 @@ export default function Home() {
                   />
                 </div>
 
-                {/* Top Cryptocurrencies Section - Show to authenticated users too */}
-                <div className="mb-8">
-                  <CryptoList limit={10} />
-                </div>
+                {/* Show crypto list for authenticated users without portfolios */}
+                {!hasPortfolios && (
+                  <div className="mb-8">
+                    <CryptoList limit={10} />
+                  </div>
+                )}
+
               </>
             ) : (
               <>
@@ -57,13 +82,13 @@ export default function Home() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
-                      onClick={() => { setAuthMode('register'); setAuthModalOpen(true); }}
+                      onClick={() => handleOpenAuthModal('register')}
                       className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
                       Get Started Free
                     </button>
                     <button
-                      onClick={() => { setAuthMode('login'); setAuthModalOpen(true); }}
+                      onClick={() => handleOpenAuthModal('login')}
                       className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200"
                     >
                       Sign In
@@ -207,8 +232,9 @@ export default function Home() {
       {/* Authentication Modal */}
       <AuthModal
         isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
+        onClose={handleCloseAuthModal}
+        mode={authMode}
+        onModeChange={handleModeChange}
       />
     </div>
   );
