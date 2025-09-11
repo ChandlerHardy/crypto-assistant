@@ -39,7 +39,7 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const [chatWithAssistant] = useMutation(CHAT_WITH_ASSISTANT);
 
@@ -67,6 +67,13 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
 
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
+    
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      inputRef.current.style.height = '52px';
+    }
+    
     setIsLoading(true);
 
     try {
@@ -125,6 +132,17 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleTextareaResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value);
+    
+    // Auto-resize textarea
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    const scrollHeight = textarea.scrollHeight;
+    const maxHeight = 120; // Max height equivalent to ~4 lines
+    textarea.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
   };
 
   const formatMessage = (content: string, role: 'user' | 'assistant') => {
@@ -193,7 +211,7 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
                 ? 'bg-blue-500 text-white'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
             }`}>
-              <div className="text-sm">
+              <div className="text-sm break-words overflow-wrap-anywhere">
                 {formatMessage(message.content, message.role)}
               </div>
               {isClient && (
@@ -233,22 +251,24 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
 
       {/* Input */}
       <div className="p-4 border-t border-white/10 dark:border-gray-600/20 bg-transparent rounded-b-lg">
-        <div className="flex gap-3">
-          <input
+        <div className="flex gap-3 items-end">
+          <textarea
             ref={inputRef}
-            type="text"
             value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
+            onChange={handleTextareaResize}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me about your crypto portfolio or market insights..."
+            placeholder=""
+            rows={1}
             className="flex-1 px-4 py-3 border border-white/20 dark:border-gray-600/30 rounded-lg 
                      bg-white/10 dark:bg-gray-700/20 text-gray-900 dark:text-white
                      placeholder-gray-600 dark:placeholder-gray-300
                      focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-white/30
-                     disabled:opacity-50 backdrop-blur-sm"
+                     disabled:opacity-50 backdrop-blur-sm resize-none overflow-y-auto
+                     min-h-[52px] max-h-[120px]"
             style={{
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
+              lineHeight: '1.5'
             }}
             disabled={isLoading}
           />
@@ -258,7 +278,7 @@ export function ChatInterface({ className = '', showHeader = true, portfolioData
             className="px-6 py-3 bg-blue-500/80 text-white rounded-lg hover:bg-blue-600/80 
                      disabled:opacity-50 disabled:cursor-not-allowed
                      transition-colors duration-200 flex items-center gap-2 backdrop-blur-sm
-                     border border-white/20"
+                     border border-white/20 h-12 flex-shrink-0"
             style={{
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',

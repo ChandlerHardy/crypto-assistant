@@ -47,7 +47,7 @@ export function AIAssistantPopup({ className = '' }: AIAssistantPopupProps) {
               bg-white/7 dark:bg-gray-900/7 
               rounded-lg shadow-2xl border border-white/20 dark:border-gray-600/20
               transition-all duration-200 ${
-              isMinimized ? 'h-14' : 'w-96 h-[500px]'
+              isMinimized ? 'h-14' : 'w-96 h-[600px]'
             } flex flex-col overflow-hidden`}
             style={{
               backdropFilter: 'blur(16px) saturate(160%)',

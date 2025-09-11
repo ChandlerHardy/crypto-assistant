@@ -74,7 +74,7 @@ export default function Home() {
                 {/* Welcome Section for Non-Authenticated Users */}
                 <div className="text-center mb-12">
                   <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-                    Track Your <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Crypto Portfolio</span>
+                    Track Your <span className="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent" style={{backgroundImage: 'linear-gradient(to right, #F7C817, #FF8C00)'}}>Crypto Portfolio</span>
                   </h1>
                   <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
                     Professional cryptocurrency portfolio management with AI-powered insights, 
@@ -83,7 +83,13 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
                       onClick={() => handleOpenAuthModal('register')}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                      style={{
+                        background: 'linear-gradient(to right, #F7C817, #FF8C00)',
+                        backgroundImage: 'linear-gradient(to right, #F7C817, #FF8C00)'
+                      }}
+                      onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundImage = 'linear-gradient(to right, #E6B614, #E67E00)'}
+                      onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundImage = 'linear-gradient(to right, #F7C817, #FF8C00)'}
                     >
                       Get Started Free
                     </button>
