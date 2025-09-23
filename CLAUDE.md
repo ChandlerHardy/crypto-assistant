@@ -15,6 +15,7 @@ Crypto Portfolio Analyzer - A real-time cryptocurrency portfolio tracking and an
 - **Portfolio**: https://chandlerhardy.com
 - **Backend API**: https://backend.chandlerhardy.com
 - **GraphQL**: https://backend.chandlerhardy.com/cryptassist/graphql
+- **Health Check**: https://backend.chandlerhardy.com/cryptassist/health
 
 ## 🖥️ Server Access
 **OCI Server:**

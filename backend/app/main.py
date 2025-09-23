@@ -76,6 +76,6 @@ app.include_router(graphql_app, prefix="/cryptassist/graphql")
 async def root():
     return {"message": "Crypto Portfolio Analyzer API"}
 
-@app.get("/health")
+@app.get("/cryptassist/health")
 async def health():
     return {"status": "healthy"}
