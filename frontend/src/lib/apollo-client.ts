@@ -22,7 +22,7 @@ const authLink = setContext((_, { headers }) => {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    for (let err of graphQLErrors) {
+    for (const err of graphQLErrors) {
       // Check for authentication errors
       if (err.message.includes('authentication') ||
           err.message.includes('Unauthorized') ||
