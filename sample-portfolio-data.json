@@ -1,0 +1,321 @@
+{
+  "portfolios": [
+    {
+      "name": "Diversified Portfolio",
+      "description": "A well-balanced portfolio with major cryptocurrencies",
+      "assets": [
+        {
+          "symbol": "BTC",
+          "name": "Bitcoin",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 0.5,
+              "pricePerUnit": 35000,
+              "timestamp": "2024-01-15T10:00:00Z"
+            },
+            {
+              "type": "buy",
+              "amount": 0.25,
+              "pricePerUnit": 42000,
+              "timestamp": "2024-03-10T14:30:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "ETH",
+          "name": "Ethereum",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 3.0,
+              "pricePerUnit": 2200,
+              "timestamp": "2024-01-20T09:15:00Z"
+            },
+            {
+              "type": "buy",
+              "amount": 2.0,
+              "pricePerUnit": 2800,
+              "timestamp": "2024-04-05T16:45:00Z"
+            },
+            {
+              "type": "sell",
+              "amount": 1.0,
+              "pricePerUnit": 3200,
+              "timestamp": "2024-05-15T11:20:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "ADA",
+          "name": "Cardano",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 1000,
+              "pricePerUnit": 0.45,
+              "timestamp": "2024-02-01T08:30:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "SOL",
+          "name": "Solana",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 50,
+              "pricePerUnit": 85,
+              "timestamp": "2024-02-20T13:00:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DeFi Focus Portfolio",
+      "description": "Portfolio focused on DeFi and smart contract platforms",
+      "assets": [
+        {
+          "symbol": "ETH",
+          "name": "Ethereum",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 5.0,
+              "pricePerUnit": 1800,
+              "timestamp": "2023-12-01T10:00:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "UNI",
+          "name": "Uniswap",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 200,
+              "pricePerUnit": 6.5,
+              "timestamp": "2024-01-10T15:30:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "AAVE",
+          "name": "Aave",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 25,
+              "pricePerUnit": 95,
+              "timestamp": "2024-01-25T12:15:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "LINK",
+          "name": "Chainlink",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 100,
+              "pricePerUnit": 14.5,
+              "timestamp": "2024-02-10T09:45:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Layer 1 Competitors",
+      "description": "Alternative layer 1 blockchain platforms",
+      "assets": [
+        {
+          "symbol": "SOL",
+          "name": "Solana",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 75,
+              "pricePerUnit": 65,
+              "timestamp": "2024-01-05T11:20:00Z"
+            },
+            {
+              "type": "buy",
+              "amount": 25,
+              "pricePerUnit": 95,
+              "timestamp": "2024-03-15T14:10:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "AVAX",
+          "name": "Avalanche",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 80,
+              "pricePerUnit": 28,
+              "timestamp": "2024-01-30T16:00:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "DOT",
+          "name": "Polkadot",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 150,
+              "pricePerUnit": 7.2,
+              "timestamp": "2024-02-05T10:30:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "NEAR",
+          "name": "NEAR Protocol",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 200,
+              "pricePerUnit": 2.8,
+              "timestamp": "2024-02-25T13:45:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meme & Speculative",
+      "description": "High-risk, high-reward speculative positions",
+      "assets": [
+        {
+          "symbol": "DOGE",
+          "name": "Dogecoin",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 5000,
+              "pricePerUnit": 0.08,
+              "timestamp": "2024-01-12T14:20:00Z"
+            },
+            {
+              "type": "sell",
+              "amount": 2000,
+              "pricePerUnit": 0.15,
+              "timestamp": "2024-04-01T10:15:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "SHIB",
+          "name": "Shiba Inu",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 50000000,
+              "pricePerUnit": 0.000012,
+              "timestamp": "2024-02-14T09:30:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "PEPE",
+          "name": "Pepe",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 100000000,
+              "pricePerUnit": 0.0000008,
+              "timestamp": "2024-03-20T16:45:00Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Blue Chip Holdings",
+      "description": "Conservative positions in established cryptocurrencies",
+      "assets": [
+        {
+          "symbol": "BTC",
+          "name": "Bitcoin",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 1.0,
+              "pricePerUnit": 30000,
+              "timestamp": "2023-10-15T10:00:00Z"
+            },
+            {
+              "type": "buy",
+              "amount": 0.5,
+              "pricePerUnit": 38000,
+              "timestamp": "2024-01-08T14:30:00Z"
+            },
+            {
+              "type": "buy",
+              "amount": 0.3,
+              "pricePerUnit": 45000,
+              "timestamp": "2024-04-20T11:15:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "ETH",
+          "name": "Ethereum",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 8.0,
+              "pricePerUnit": 1600,
+              "timestamp": "2023-11-01T09:00:00Z"
+            },
+            {
+              "type": "buy",
+              "amount": 4.0,
+              "pricePerUnit": 2400,
+              "timestamp": "2024-02-15T15:20:00Z"
+            }
+          ]
+        },
+        {
+          "symbol": "BNB",
+          "name": "BNB",
+          "transactions": [
+            {
+              "type": "buy",
+              "amount": 15,
+              "pricePerUnit": 280,
+              "timestamp": "2024-01-18T12:45:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": {
+    "description": "Sample portfolio data for testing the Crypto Portfolio Analyzer",
+    "features_demonstrated": [
+      "Multiple portfolios with different strategies",
+      "Mix of major cryptocurrencies (BTC, ETH) and altcoins",
+      "DeFi tokens (UNI, AAVE, LINK)",
+      "Layer 1 competitors (SOL, AVAX, DOT, NEAR)",
+      "Meme coins for high-risk scenarios (DOGE, SHIB, PEPE)",
+      "Multiple buy/sell transactions showing P&L tracking",
+      "Different investment timeframes",
+      "Realistic price points and amounts",
+      "Profit-taking scenarios (ETH and DOGE sales)"
+    ],
+    "testing_scenarios": [
+      "Portfolio diversification analysis",
+      "Realized vs unrealized P&L calculations",
+      "FIFO cost basis tracking with multiple buys",
+      "Performance comparison across different strategies",
+      "Risk assessment with volatile assets",
+      "Historical transaction preservation"
+    ],
+    "usage": "Import this data using GraphQL mutations or create a script to populate the database for testing and demonstration purposes."
+  }
+}

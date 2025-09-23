@@ -59,6 +59,12 @@ npm run build
 curl -X POST "https://backend.chandlerhardy.com/cryptassist/graphql" \
   -H "Content-Type: application/json" \
   -d '{"query":"mutation { chatWithAssistant(message: \"Hello\") }"}'
+
+# Populate sample portfolio data
+python3 scripts/populate_with_available_assets.py
+
+# Check available cryptocurrencies
+python3 scripts/check_available_cryptos.py
 ```
 
 ## 🤖 AI Chat Service
@@ -66,6 +72,28 @@ curl -X POST "https://backend.chandlerhardy.com/cryptassist/graphql" \
 - **Model**: GitHub Llama 3.1 8B Instruct
 - **Features**: Portfolio-aware advice, real-time market analysis
 - **UI**: Glassmorphism floating chat widget
+
+## 📊 Sample Portfolio Data & Population Tools
+- **Status**: ✅ Working and tested
+- **Location**: `/scripts/` directory
+- **Purpose**: Create realistic portfolio data for testing and demonstrations
+
+**Available Scripts:**
+- `populate_with_available_assets.py` - Creates working demo portfolio with BTC, ETH, XRP
+- `check_available_cryptos.py` - Lists available cryptocurrencies in the system
+- `sample-portfolio-data.json` - Comprehensive sample data (5 portfolio strategies)
+- `populate_sample_data.py` - Full population script (requires more crypto assets)
+
+**Features Demonstrated:**
+- Multiple buy transactions (Dollar Cost Averaging)
+- Buy and sell transactions (realized profit/loss calculations)
+- FIFO cost basis tracking
+- Transaction history preservation
+- Diverse investment strategies (DeFi, Layer 1, Blue Chip, Speculative)
+
+**GraphQL Schema Requirements:**
+- Assets: `portfolioId`, `cryptoId` (not symbol), `amount`, `buyPrice`
+- Transactions: `portfolioId`, `assetId`, `transactionType`, `amount`, `pricePerUnit`, `notes`
 
 ## 📁 Key File Locations
 ```
@@ -87,6 +115,12 @@ crypto-assistant/
 │   └── docker-compose.backend.yml # Production container config
 ├── deploy/
 │   └── deploy-backend-to-oci.sh  # Main deployment script
+├── scripts/                      # Sample data and utilities
+│   ├── populate_with_available_assets.py  # Working portfolio creator
+│   ├── check_available_cryptos.py         # Check available assets
+│   ├── sample-portfolio-data.json         # Comprehensive sample data
+│   ├── populate_sample_data.py            # Full population script
+│   └── README.md                          # Scripts documentation
 └── CLAUDE.md                     # This file
 ```
 
@@ -134,7 +168,7 @@ crypto-assistant/
   - Clean card-based layout with crypto icons and fallback letters
   - Fixed authentication flow issues (modal dismissal, route redirects)
   - Improved Apollo GraphQL client with proper JWT token authentication
-- ✅ **Enhanced AI Chatbot Interface** (Latest - Completed)
+- ✅ **Enhanced AI Chatbot Interface** (Completed)
   - Auto-expanding textarea for multi-line messages (Facebook-style)
   - Clean single-line input that grows vertically as needed
   - Improved text wrapping for long strings without spaces
@@ -143,6 +177,21 @@ crypto-assistant/
   - Brand color integration (#F7C817) in UI elements for consistency
   - Removed placeholder text for cleaner initial appearance
   - Better readability with dark gray text on golden buttons
+- ✅ **Authentication System Improvements & Database Persistence** (Latest - Completed)
+  - Fixed JWT token expiration management (7-day tokens vs 30-minute)
+  - Added client-side token validation and auto-cleanup of expired tokens
+  - Enhanced GraphQL error handling with automatic auth recovery
+  - Implemented persistent PostgreSQL database with proper docker-compose
+  - Fixed deployment script to use correct PostgreSQL configuration
+  - Resolved database reset issues on backend deployments
+  - Admin user persistence across deployments
+- ✅ **Sample Portfolio Data & Population Tools** (Latest - Completed)
+  - Comprehensive sample portfolio data with 5 investment strategies
+  - Working portfolio population scripts with correct GraphQL schema
+  - Demonstrated features: DCA, realized P&L, transaction histories
+  - Python and Bash scripts for easy data population
+  - Fixed GraphQL mutations (cryptoId, buyPrice, transactionType fields)
+  - Sample portfolios: Diversified, DeFi, Layer 1s, Blue Chip strategies
 
 ## 🔄 Development Workflow
 1. **Make changes** locally in frontend/ or backend/
@@ -308,6 +357,7 @@ mutation CreateAdminUser($email: String!, $password: String!, $adminSecret: Stri
 - **ARM64 architecture**: OCI server uses ARM, not x86
 - **Environment variables**: Docker needs explicit env var passing
 - **CORS configuration**: Frontend domain must be in backend CORS_ORIGINS
+- **Cryptocurrency API Rate Limiting**: CoinGecko API may return limited assets (3 instead of expected 100+) due to rate limiting or API key issues. Core portfolio functionality works correctly - this only affects available asset selection.
 
 ## 💡 Important Notes
 - Backend runs on OCI Always Free tier (ARM64)
