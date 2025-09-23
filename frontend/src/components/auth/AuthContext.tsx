@@ -3,6 +3,17 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthResponse } from '@/types/crypto';
 
+// Function to check if JWT token is valid and not expired
+const isTokenValid = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    return payload.exp > currentTime;
+  } catch {
+    return false;
+  }
+};
+
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -35,19 +46,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Check for stored auth data on mount
     const storedToken = localStorage.getItem('authToken');
     const storedUser = localStorage.getItem('authUser');
-    
+
     if (storedToken && storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(parsedUser);
+        // Validate token is not expired
+        if (isTokenValid(storedToken)) {
+          const parsedUser = JSON.parse(storedUser);
+          setToken(storedToken);
+          setUser(parsedUser);
+        } else {
+          console.log('Stored token is expired, clearing auth data');
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+        }
       } catch (error) {
         console.error('Error parsing stored auth data:', error);
         localStorage.removeItem('authToken');
         localStorage.removeItem('authUser');
       }
     }
-    
+
     setIsLoading(false);
   }, []);
 
