@@ -10,7 +10,7 @@ OCI_IP="${1:-}"
 OCI_USER="${OCI_USER:-ubuntu}"
 SSH_KEY_PATH="${SSH_KEY_PATH:-/Users/chandlerhardy/.ssh/ampere.key}"
 APP_NAME="crypto-assistant"
-DOCKER_COMPOSE_FILE="docker-compose.backend.yml"
+DOCKER_COMPOSE_FILE="docker-compose.backend-postgres.yml"
 
 # SSH command with key
 SSH_CMD="ssh -i $SSH_KEY_PATH -o ConnectTimeout=10 -o BatchMode=yes"
@@ -73,7 +73,7 @@ rsync -avz --progress -e "$RSYNC_SSH" \
 
 # Copy deployment files
 rsync -avz --progress -e "$RSYNC_SSH" \
-    ./docker-compose.backend.yml \
+    ./docker-compose.backend-postgres.yml \
     "$OCI_USER@$OCI_IP:~/$APP_NAME/"
 
 # Install Docker and Docker Compose on OCI instance
