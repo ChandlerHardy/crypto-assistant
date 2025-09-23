@@ -146,14 +146,14 @@ print_status "Testing backend deployment..."
 sleep 10
 
 # Test backend health
-if curl -f "http://$OCI_IP:8000/health" >/dev/null 2>&1; then
+if curl -f "http://$OCI_IP:8000/cryptassist/health" >/dev/null 2>&1; then
     print_status "✅ Backend is healthy at http://$OCI_IP:8000"
 else
     print_warning "⚠️  Backend health check failed - check logs with: ssh $OCI_USER@$OCI_IP 'cd $APP_NAME && docker-compose -f $DOCKER_COMPOSE_FILE logs backend'"
 fi
 
 # Test GraphQL endpoint
-if curl -f "http://$OCI_IP:8000/graphql" >/dev/null 2>&1; then
+if curl -f "http://$OCI_IP:8000/cryptassist/graphql" >/dev/null 2>&1; then
     print_status "✅ GraphQL endpoint is accessible"
 else
     print_warning "⚠️  GraphQL endpoint check failed"
@@ -163,12 +163,12 @@ print_status "🎉 Backend deployment completed!"
 print_status ""
 print_status "Your backend is accessible at:"
 print_status "🔗 Backend API: http://$OCI_IP:8000"
-print_status "🔗 GraphQL Playground: http://$OCI_IP:8000/graphql"
-print_status "🔗 Health Check: http://$OCI_IP:8000/health"
+print_status "🔗 GraphQL Playground: http://$OCI_IP:8000/cryptassist/graphql"
+print_status "🔗 Health Check: http://$OCI_IP:8000/cryptassist/health"
 print_status ""
 print_status "📋 NEXT STEPS:"
 print_status "1. Update your Vercel environment variable:"
-print_status "   NEXT_PUBLIC_GRAPHQL_URL=http://$OCI_IP:8000/graphql"
+print_status "   NEXT_PUBLIC_GRAPHQL_URL=http://$OCI_IP:8000/cryptassist/graphql"
 print_status ""
 print_status "2. Update your backend CORS to allow Vercel:"
 print_status "   CORS_ORIGINS=https://your-vercel-app.vercel.app"
